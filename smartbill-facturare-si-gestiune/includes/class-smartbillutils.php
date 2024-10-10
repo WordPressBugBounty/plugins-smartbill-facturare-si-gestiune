@@ -36,6 +36,7 @@ class SmartBillUtils {
 	 */
 	public static function get_order_products( $order, $product_settings ) {
 		$products = [];
+		static $inline_discounts = [];
 
 		$order_items = $order->get_items();
 		$compound_discount=0;
@@ -56,11 +57,12 @@ class SmartBillUtils {
 				}
 				$products[ $item_id ] = $order_product;
 				
-				// add custom discount if exists
+				//add custom discount if exists
 				$custom_line_discount = self::create_custom_line_discount(
 					$order,
 					$s_item,
 					$qty,
+					$inline_discounts,
 					$product_settings, 
 					$compound_discount
 				);
@@ -87,7 +89,7 @@ class SmartBillUtils {
 
 		// order discount (coupons).
 		$existing_products = $products;
-		$order_coupons     = self::get_order_coupons( $order, $product_settings, $existing_products );
+		$order_coupons     = self::get_order_coupons( $order, $inline_discounts, $product_settings, $existing_products );
 		if ( ! empty( $order_coupons ) ) {
 			if ( count( self::smrt_get_items_tax_classes( $order ) ) > 1 && Smartbill_Woocommerce_Settings::SMARTBILL_VAT_VALUE_FOR_PLATFORM == $product_settings['product_vat'] ) {
 				foreach ( $products as $item_id => $product ) {
@@ -131,7 +133,7 @@ class SmartBillUtils {
 	 *
 	 * @return stdClass|null $discount smartbill discount.
 	 */
-	public static function create_custom_line_discount($order, $order_item, $quantity, $product_settings, &$compound_discount){
+	public static function create_custom_line_discount($order, $order_item, $quantity, &$inline_discounts,$product_settings, &$compound_discount){
 		$total_before_discount = $order_item->get_subtotal();
 		$total_after_discount = $order_item->get_total();
 		$total_discount_before_tax = $total_before_discount - $total_after_discount;	
@@ -147,7 +149,7 @@ class SmartBillUtils {
 			$all_items = $order->get_items();
 			foreach ( $all_items as $item ) {
 				// Check if the item is free (total or subtotal is 0)
-				if ( $item->get_total() == 0 && $item->get_subtotal() == 0 ) {
+				if ( $item->get_total() == 0 || $item->get_subtotal() == 0 ) {
 					// Increment the counter
 					$free_items_count += $item->get_quantity();
 				}
@@ -162,7 +164,12 @@ class SmartBillUtils {
 							$coupon_discount_before_tax += $coupon->get_discount_amount($total_before_discount, $order_item, $order );
 							break;
 						default:
-							$coupon_discount_before_tax += $coupon_line->get_discount() / ($order->get_item_count()-$free_items_count) * $order_item->get_quantity();
+							$items_quatity = ($order->get_item_count()-$free_items_count) * $order_item->get_quantity();
+							if( 0 != $items_quatity){
+								$coupon_discount_before_tax += $coupon_line->get_discount()/$items_quatity;
+							}else{
+								$coupon_discount_before_tax += $coupon_line->get_discount();
+							}
 							break;
 					}
 				}else{
@@ -196,10 +203,13 @@ class SmartBillUtils {
 		// Check if woocommerce tax is enabled
 		$woocommerce_taxe_settings = 'yes' == get_option( 'woocommerce_calc_taxes' );
 		// If disabled use smartbill tax settings
-		$woocommerce_taxes = $woocommerce_taxe_settings ? false : $product_settings['included_vat'];
+		$admin_settings            = new Smartbill_Woocommerce_Admin_Settings_Fields();
+		$woocommerce_taxes 	       = $woocommerce_taxe_settings ? false : $product_settings['included_vat'];
+		$saved_vat                 = $admin_settings->get_product_vat();
 
 		$product = new stdClass();
 		$product->discountValue = -1*$automatic_discount_before_tax;
+		$inline_discounts[$order_item->get_id()]=$product->discountValue;
 
 		if($product->discountValue >=-0.1){
 			return null;
@@ -210,7 +220,7 @@ class SmartBillUtils {
 		$product->isDiscount         = true;
 		$product->discountPercentage = 0;
 		$product->discountType       = 1;
-		$product->isTaxIncluded      = (bool) $woocommerce_taxes;
+		$product->isTaxIncluded      = "WooCommerce" != $saved_vat ? true : (bool) $woocommerce_taxes;
 		$um                          = $product_settings['um'];
 
 		if ( ! in_array( strtolower( $um ), array( 'no_value', 'preluata-din-smartbill' ) ) ) {
@@ -288,7 +298,7 @@ class SmartBillUtils {
 				$product->discountValue =  ( -1 ) * floatval( abs( $regular_price_vat*$qty - $line_item ) );
 
 				// skip discount if 0
-				if(0 == $product->discountValue){
+				if(0 == round($product->discountValue,2)){
 					continue;
 				}
 				
@@ -296,14 +306,14 @@ class SmartBillUtils {
 				$woocommerce_taxe_settings = 'yes' == get_option( 'woocommerce_calc_taxes' );
 				// If disabled use smartbill tax settings
 				$woocommerce_taxes = $woocommerce_taxe_settings ? false : $product_settings['included_vat'];
-
+				$saved_vat = $admin_settings->get_product_vat();
 
 				$product->code               = 'discount';
 				$product->currency           = $product_settings['billing_currency'];
 				$product->isDiscount         = true;
 				$product->discountPercentage = 0;
 				$product->discountType       = 1;
-				$product->isTaxIncluded      = (bool) $woocommerce_taxes;
+				$product->isTaxIncluded      = "WooCommerce" != $saved_vat && 0 == $item->get_subtotal_tax() ? true : (bool) $woocommerce_taxes;
 				$um                          = $product_settings['um'];
 
 				if ( ! in_array( strtolower( $um ), array( 'no_value', 'preluata-din-smartbill' ) ) ) {
@@ -391,18 +401,20 @@ class SmartBillUtils {
 	 *
 	 * @return Array   $products
 	 */
-	private static function get_order_coupons( $order, $product_settings, $existing_products ) {
+	private static function get_order_coupons( $order, &$inline_discounts, $product_settings, $existing_products ) {
 		$data              = $order->get_data();
 		$coupons           = $data['coupon_lines'];
 
 		// Check if woocommerce tax is enabled
 		$woocommerce_taxe_settings = 'yes' == get_option( 'woocommerce_calc_taxes' );
 		// If disabled use smartbill tax settings
+		$admin_settings            = new Smartbill_Woocommerce_Admin_Settings_Fields();
 		$woocommerce_taxes = $woocommerce_taxe_settings ? false : $product_settings['included_vat'];
+		$saved_vat = $admin_settings->get_product_vat();
 
 		$products          = array();
 		if ( ! empty( $coupons ) ) {
-			if ( count( self::smrt_get_items_tax_classes( $order ) ) > 1 && Smartbill_Woocommerce_Settings::SMARTBILL_VAT_VALUE_FOR_PLATFORM == $product_settings['product_vat'] ) {
+			if ( ("WooCommerce" != $saved_vat) || count( self::smrt_get_items_tax_classes( $order ) ) > 1 && Smartbill_Woocommerce_Settings::SMARTBILL_VAT_VALUE_FOR_PLATFORM == $product_settings['product_vat'] ) {
 				foreach ( $order->get_items() as $item_id => $temp_item ) {
 					$product                     = new stdClass();
 					$product->code               = 'coupon';
@@ -410,7 +422,7 @@ class SmartBillUtils {
 					$product->isDiscount         = true;
 					$product->discountPercentage = 0;
 					$product->discountType       = 1;
-					$product->isTaxIncluded      = $woocommerce_taxes;
+					$product->isTaxIncluded      = (bool)$woocommerce_taxes;
 					$product->measuringUnitName  = '@@@@@';
 
 					if ( ! in_array( strtolower( $product_settings['um'] ), array( 'no_value', 'preluata-din-smartbill' ) ) ) {
@@ -424,7 +436,7 @@ class SmartBillUtils {
 
 					$product->price         = 0;
 					$product->quantity      = 0;
-					$product->numberOfItems = 1;
+					$product->numberOfItems = 0;
 					$product->saveToDb      = false;
 					$item_subtotal          = $temp_item->get_subtotal();
 					
@@ -437,6 +449,15 @@ class SmartBillUtils {
 					$tax                    = number_format( (float) $temp_item->get_subtotal_tax(), 2 );
 					$tabper                 = number_format( (float) $tax / $item_subtotal, 2 ) * 100;
 					$product->discountValue = -1 * $new_discount;
+
+					if("WooCommerce" != $saved_vat || 0 == $temp_item->get_subtotal_tax()){
+						$product->isTaxIncluded = true;
+						$product->discountValue = -1 * $new_discount-($new_discount*($tabper/100)); 
+						
+						if(isset($inline_discounts[$item_id])){
+							$product->discountValue = $product->discountValue-$inline_discounts[$item_id];
+						}
+					}					
 					
 					if(0 == $product->discountValue){
 						continue;
@@ -444,9 +465,14 @@ class SmartBillUtils {
 					
 					if ( $product_settings['isTaxPayer'] ) {
 						$vat_rates              = Smartbill_Woocommerce_Settings::get_vat_rates();
-						$tax_name               = self::get_tax_name_by_percentage( $vat_rates, $tabper, $temp_item );
-						$product->taxName       = $tax_name;
-						$product->taxPercentage = $tabper;
+						if("WooCommerce" != $saved_vat){
+							$result['taxName']       = $vat_rates[ $saved_vat ]['name'];
+							$result['taxPercentage'] = $vat_rates[ $saved_vat ]['percentage'];
+						}else{
+							$tax_name               = self::get_tax_name_by_percentage( $vat_rates, $tabper, $temp_item);
+							$product->taxName       = $tax_name;
+							$product->taxPercentage = $tabper;
+						}
 					}
 					$product->warehouseName = $product_settings['warehouse'];
 					$products[ $item_id ]   = $product;

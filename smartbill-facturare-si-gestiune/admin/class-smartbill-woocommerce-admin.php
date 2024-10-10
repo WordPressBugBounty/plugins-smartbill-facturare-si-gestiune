@@ -179,7 +179,7 @@ class Smartbill_Woocommerce_Admin {
 							$smartbill_settings['send_mail_with_document'] = $options['send_mail_with_document'];
 						}
 					}
-					wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/smartbill-woocommerce-admin.js', array( 'jquery' ), $this->version . time(), false );
+					wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/smartbill-woocommerce-admin.min.js', array( 'jquery' ), $this->version . time(), false );
 					wp_localize_script( $this->plugin_name, 'smartbill', $smartbill_settings );
 					if ( 'smartbill-woocommerce-settings' == $_GET['page'] ) {
 						if ( get_option( 'smartbill_set_toast' ) ) {
@@ -218,7 +218,7 @@ class Smartbill_Woocommerce_Admin {
 							$smartbill_settings['send_mail_with_document'] = $options['send_mail_with_document'];
 						}
 					}
-					wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/smartbill-woocommerce-admin.js', array( 'jquery' ), $this->version . time(), false );
+					wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/smartbill-woocommerce-admin.min.js', array( 'jquery' ), $this->version . time(), false );
 					wp_localize_script( $this->plugin_name, 'smartbill', $smartbill_settings );
 					if (!wp_script_is('toastify', 'registered')) {
 						wp_enqueue_script( 'toastify', plugin_dir_url( __FILE__ ) . ( 'js/toastify.js' ), array( 'jquery' ), $this->version, false );
@@ -526,13 +526,24 @@ class Smartbill_Woocommerce_Admin {
 		$admin_settings = new Smartbill_Woocommerce_Admin_Settings_Fields();
 
 		if ( $admin_settings->get_public_invoice() ) {
-			$wtclass = get_post_meta( $order_id, 'smartbill_invoice_log' );
+			// $public_invoice_link = get_post_meta( $order_id, 'smartbill_public_link' );
+			// if(!empty($public_invoice_link) && isset( $public_invoice_link[0] ) ){
+				
+			// 	echo '<section class="woocommerce-customer-details"> <h2 class="woocommerce-column__title">';
+			// 	echo esc_attr( __( 'Factura', 'smartbill_woocommerce' ) ) . '</h2> <a target="_blank" href="' . esc_url( $public_invoice_link[0] ) . '" class="woocommerce-button button view">';
+			// 	echo esc_attr( $admin_settings->get_view_invoice_text() ) . '</a></section>';
 
-			if ( $wtclass && isset( $wtclass[0] ) && isset( $wtclass[0]['smartbill_view_document_url'] ) ) {
-				echo '<section class="woocommerce-customer-details"> <h2 class="woocommerce-column__title">';
-				echo esc_attr( __( 'Factura', 'smartbill_woocommerce' ) ) . '</h2> <a target="_blank" href="' . esc_url( $wtclass[0]['smartbill_view_document_url'] ) . '" class="woocommerce-button button view">';
-				echo esc_attr( $admin_settings->get_view_invoice_text() ) . '</a></section>';
-			}
+			// }else{
+
+				$wtclass = get_post_meta( $order_id, 'smartbill_invoice_log' );
+
+				if ( $wtclass && isset( $wtclass[0] ) && isset( $wtclass[0]['smartbill_view_document_url'] ) ) {
+					echo '<section class="woocommerce-customer-details"> <h2 class="woocommerce-column__title">';
+					echo esc_attr( __( 'Factura', 'smartbill_woocommerce' ) ) . '</h2> <a target="_blank" href="' . esc_url( $wtclass[0]['smartbill_view_document_url'] ) . '" class="woocommerce-button button view">';
+					echo esc_attr( $admin_settings->get_view_invoice_text() ) . '</a></section>';
+				}
+			// }
+			
 		}
 	}
 

@@ -1,7 +1,7 @@
 === SmartBill Facturare si Gestiune ===
 Requires at least: 4.7.0
-Tested up to: 6.5
-Stable tag: 3.2.4
+Tested up to: 6.6.0
+Stable tag: 3.3.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -54,6 +54,9 @@ Dupa prima configurare a modulului recomandam activarea optiunii “Emite ciorna
 Te rugam sa ne contactezi la plugins@smartbill.ro.
 
 == Changelog ==
+
+= 3.3.2 =
+* Fix - Corectii la calcularea discounturilor si cupoanelor
 
 = 3.2.6 =
 * Fix - Corectie calcul discount cand valoarea produsului e mai mica decat cea a discountului

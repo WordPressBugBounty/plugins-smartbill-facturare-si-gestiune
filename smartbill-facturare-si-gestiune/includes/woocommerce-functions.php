@@ -156,7 +156,7 @@ function smartbill_woocommerce_send_document_mail() {
 function smartbill_woocommerce_issue_document() {
 	check_ajax_referer( 'smartbill_nonce', 'security' );
 	if ( isset( $_POST['data'] ) && isset( $_POST['data']['order_id'] ) ) {
-			$order_id = (int) sanitize_text_field( wp_unslash( $_POST['data']['order_id'] ) );
+		$order_id = (int) sanitize_text_field( wp_unslash( $_POST['data']['order_id'] ) );
 		if ( ! is_numeric( $order_id ) || ( $order_id <= 0 ) ) {
 			$return['status']  = false;
 			$return['message'] = __( 'Comanda furnizata este invalida', 'smartbill-woocommerce' );
@@ -584,11 +584,11 @@ function smartbill_create_document( $order_id, $get_um = true ) {
 		$client->set_data_logger( $invoice_logger );
 		if ( Smartbill_Woocommerce_Settings::SMARTBILL_DOCUMENT_TYPE_INVOICE == $document_settings['document_type'] ) {
 			if ( ! empty( $order->get_date_paid() ) && true == $document_settings['invoice_cashing'] ) {
-					$smartbill_invoice['payment'] = array(
-						'value'  => $order->get_total(),
-						'type'   => 'Card online',
-						'isCash' => false,
-					);
+				$smartbill_invoice['payment'] = array(
+					'value'  => $order->get_total(),
+					'type'   => 'Card online',
+					'isCash' => false,
+				);
 			}
 			$server_call = $client->create_invoice_with_document_address( $smartbill_invoice, $debug_mode );
 		} elseif ( Smartbill_Woocommerce_Settings::SMARTBILL_DOCUMENT_TYPE_ESTIMATE == $document_settings['document_type'] ) {
@@ -776,7 +776,7 @@ function smartbill_add_invoice_column_content( $column ,$order) {
 		case 'smartbill_woocommerce_invoice':
 			$invoice_log        = get_post_meta( $order_id, 'smartbill_invoice_log', true );
 			$document_url       = get_post_meta( $order_id, 'smartbill_private_link', true );
-						$series = isset( $invoice_log['smartbill_series'] ) ? $invoice_log['smartbill_series'] : '';
+			$series    			= isset( $invoice_log['smartbill_series'] ) ? $invoice_log['smartbill_series'] : '';
 			$number             = isset( $invoice_log['smartbill_invoice_id'] ) ? $invoice_log['smartbill_invoice_id'] : '';
 			// Modificam sa duca spre vizualizare, nu spre editare.
 			$pattern      = '/editare/';
@@ -802,8 +802,8 @@ if ( check_smartbill_compatibility() || in_array( 'woocommerce/woocommerce.php',
 	add_filter( 'manage_edit-shop_order_columns', 'smartbill_add_invoice_column', 11 );
 	add_action( 'manage_shop_order_posts_custom_column', 'smartbill_add_invoice_column_content', 11, 2 );
 	add_action( 'add_meta_boxes', 'smartbill_order_details_meta_box', 10, 2 );
-	// display issue document button.
-	add_action( 'init', 'smartbill_init_plugin_actions' );
+	// TO DO: Investigate further
+	// add_action( 'init', 'smartbill_init_plugin_actions' ); // display issue document button.
 
 	add_action( 'wp_ajax_smartbill_woocommerce_issue_document', 'smartbill_woocommerce_issue_document' );
 	add_action( 'wp_ajax_smartbill_woocommerce_send_document_mail', 'smartbill_woocommerce_send_document_mail' );
