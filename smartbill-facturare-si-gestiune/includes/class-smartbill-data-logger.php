@@ -83,7 +83,7 @@ class SmartBill_Data_Logger {
 		if ( $key && array_key_exists( $key, $existing_data ) ) {
 			return $existing_data[ $key ];
 		}
-		return $existing_data;
+		return wp_json_encode($existing_data);
 	}
 
 	/**

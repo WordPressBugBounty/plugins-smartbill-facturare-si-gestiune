@@ -164,11 +164,11 @@ class SmartBillUtils {
 							$coupon_discount_before_tax += $coupon->get_discount_amount($total_before_discount, $order_item, $order );
 							break;
 						default:
-							$items_quatity = ($order->get_item_count()-$free_items_count) * $order_item->get_quantity();
+							$items_quatity = ($order->get_item_count()-$free_items_count);
 							if( 0 != $items_quatity){
-								$coupon_discount_before_tax += $coupon_line->get_discount()/$items_quatity;
+								$coupon_discount_before_tax += ($coupon_line->get_discount()/$items_quatity) * $order_item->get_quantity();
 							}else{
-								$coupon_discount_before_tax += $coupon_line->get_discount();
+								$coupon_discount_before_tax += $coupon_line->get_discount() * $order_item->get_quantity();
 							}
 							break;
 					}
