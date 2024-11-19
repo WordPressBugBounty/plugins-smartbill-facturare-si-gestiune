@@ -120,7 +120,7 @@
                 }).showToast();
             } else {
                 info_message.innerHTML = "Stocurile produselor din WooCommerce <strong>vor fi actualizate</strong> cu stocurile produselor din <strong>gestiunea " + warehouse + "</strong>."
-                swal.fire({
+                Swal.fire({
                     title: 'Atentie!',
                     html: info_message,
                     icon: 'warning',
@@ -136,7 +136,7 @@
                     info_message = document.createElement("div");
                     info_message.innerHTML = "Va rugam asteptati finalizarea preluarii...";
 
-                    swal.fire({
+                    Swal.fire({
                         title: "Se incarca!",
                         html: info_message,
                         icon: 'info',
@@ -158,8 +158,8 @@
                                 info_message = document.createElement("div")
                                 info_message.innerHTML = response.data;
                                 if (undefined != response.data) {
-                                    swal.close();
-                                    swal.fire({
+                                    Swal.close();
+                                    Swal.fire({
                                         title: "",
                                         html: info_message,
                                         icon: response.icon,
@@ -173,7 +173,7 @@
                                             return false;
                                         };
 
-                                        swal.fire({
+                                        Swal.fire({
                                             title: "Descarcarea documentului va incepe curand…",
                                             html: document.createElement("div"),
                                             icon: 'info',
@@ -193,7 +193,7 @@
 
                                                 try {
                                                     if (undefined != response.data) {
-                                                        swal.close();
+                                                        Swal.close();
                                                         location.href = response.data;
                                                     } else {
                                                         throw response.error;
@@ -245,7 +245,7 @@
         $("#smartbill-download-sync-stock-history").click(function (e) {
             e.preventDefault();
 
-            swal.fire({
+            Swal.fire({
                 title: "Descarcarea documentului va incepe curand…",
                 html: document.createElement("div"),
                 icon: 'warning',
@@ -265,7 +265,7 @@
 
                     try {
                         if (undefined != response.data) {
-                            swal.close();
+                            Swal.close();
                             location.href = response.data;
                         } else {
                             throw response.error;
@@ -319,7 +319,7 @@
         */
         $('#get-smartbill-setting').click(function (e) {
             e.preventDefault();
-            swal.fire({
+            Swal.fire({
                 title: "Se preiau informatiile din SmartBill…",
                 html: document.createElement("div"),
                 icon: 'warning',
@@ -383,7 +383,7 @@
                             e.preventDefault();
                             attention_text = document.createElement("div");
                             attention_text.innerHTML = "Comanda #" + smartbill.post_id + " va fi emisa in SmartBill.";
-                            swal.fire({
+                            Swal.fire({
                                 title: "Modulul SmartBill a detectat modificarea statusului comenzii",
                                 html: attention_text,
                                 icon: 'warning',
@@ -415,7 +415,7 @@
                             attention_text = document.createElement("div");
                             saveMessages();
                             attention_text.innerHTML = "Te informam ca nu se va emite automat o alta comanda in SmartBill.";
-                            swal.fire({
+                            Swal.fire({
                                 title: "Comanda a fost deja facturata in SmartBill. ",
                                 html: attention_text,
                                 icon: 'warning',
@@ -504,7 +504,7 @@
                                 attention_text.innerHTML = "Exista o comanda care a fost deja facturata. <br/> Doar comanda nefacturata va fi emisa in SmartBill.";
                             }
 
-                            swal.fire({
+                            Swal.fire({
                                 title: "Atentie!",
                                 html: attention_text,
                                 icon: 'warning',
@@ -519,7 +519,7 @@
                                 }
                                 var info_text = document.createElement("div");
                                 info_text.innerHTML = "Va rugam asteptati raspunsul serverului...";
-                                swal.fire({
+                                Swal.fire({
                                     title: 'Se incarca!',
                                     html: info_text,
                                     icon: 'info',
@@ -563,7 +563,7 @@
                                     });
                                 };
                                 start().then(function () {
-                                    swal.close();
+                                    Swal.close();
                                     window.location.reload();
                                 });
                             });
@@ -573,7 +573,7 @@
                             e.preventDefault();
                             var info_text = document.createElement("div");
                             info_text.innerHTML = "Va rugam asteptati raspunsul serverului...";
-                            swal.fire({
+                            Swal.fire({
                                 title: 'Se incarca!',
                                 html: info_text,
                                 icon: 'info',
@@ -609,7 +609,7 @@
                                 });
                             };
                             start().then(function () {
-                                swal.close();
+                                Swal.close();
                                 window.location.reload();
                             });
                         }
@@ -620,7 +620,7 @@
                         if (orders_with_invoices.length == 1) {
                             attention_text.innerHTML = "Comanda selectata este deja facturata in SmartBill.";
                         }
-                        swal.fire({
+                        Swal.fire({
                             title: "Atentie!",
                             html: attention_text,
                             icon: 'warning',
@@ -636,7 +636,7 @@
                           
                             var info_text = document.createElement("div");
                             info_text.innerHTML = "Va rugam asteptati raspunsul serverului...";
-                            swal.fire({
+                            Swal.fire({
                                 title: 'Se incarca!',
                                 html: info_text,
                                 icon: 'info',
@@ -674,7 +674,7 @@
                                 });
                             };
                             start().then(function () {
-                                swal.close();
+                                Swal.close();
                                 window.location.reload();
                             });
                         });
@@ -698,12 +698,12 @@
                                     attention_text.innerHTML = "O comanda nu a fost facturata. <br/> Doar comenzile facturate vor fi trimise prin e-mail clientilor.";
                                     button_message = 'Trimite documentul clientului';
                                 }
-                                swal.fire({
+                                Swal.fire({
                                     title: "Atentie!", html: attention_text, icon: 'warning', buttonsStyling: true, reverseButtons: true, showCancelButton: true, confirmButtonText: button_message, cancelButtonText: 'Renunta'}).then(function (result) {
                                     if (result.isDismissed) { return false; }
                                     var info_text = document.createElement("div");
                                     info_text.innerHTML = "Va rugam asteptati raspunsul serverului...";
-                                    swal.fire({
+                                    Swal.fire({
                                         title: 'Se incarca!',
                                         html: info_text,
                                         icon: 'info',
@@ -741,7 +741,7 @@
                                         });
                                     };
                                     start().then(function () {
-                                        swal.close();
+                                        Swal.close();
                                         window.location.reload();
                                     });
                                 });
@@ -749,7 +749,7 @@
                                 e.preventDefault();
                                 var info_text = document.createElement("div");
                                 info_text.innerHTML = "Va rugam asteptati raspunsul serverului...";
-                                swal.fire({
+                                Swal.fire({
                                     title: 'Se incarca!',
                                     html: info_text,
                                     icon: 'info',
@@ -785,7 +785,7 @@
                                     });
                                 };
                                 start().then(function () {
-                                    swal.close();
+                                    Swal.close();
                                     window.location.reload();
                                 });
                             }
@@ -796,11 +796,11 @@
                                 attention_text.innerHTML = "Comanda selectata nu este facturata in SmartBill.";
                             }
 
-                            swal.fire({ title: "Atentie!", html: attention_text, icon: 'warning', showCancelButton: true, confirmButtonText: 'Emite in SmartBill', cancelButtonText: 'Renunta'}).then(function (result) {
+                            Swal.fire({ title: "Atentie!", html: attention_text, icon: 'warning', showCancelButton: true, confirmButtonText: 'Emite in SmartBill', cancelButtonText: 'Renunta'}).then(function (result) {
                                 if (result.isDismissed) { return false; }
                                 var info_text = document.createElement("div");
                                 info_text.innerHTML = "Va rugam asteptati raspunsul serverului...";
-                                swal.fire({
+                                Swal.fire({
                                     title: 'Se incarca!',
                                     html: info_text,
                                     icon: 'info',
@@ -837,7 +837,7 @@
                                     });
                                 };
                                 start().then(function () {
-                                    swal.close();
+                                    Swal.close();
                                     window.location.reload();
                                 });
 
@@ -875,7 +875,7 @@
                                     titleSwal = "Modulul SmartBill a detectat modificarea statusului unei comenzi.";
                                     textButton = 'Emite document';
                                 }
-                                swal.fire({
+                                Swal.fire({
                                     title: titleSwal,
                                     html: attention_text,
                                     icon: 'warning',
@@ -890,7 +890,7 @@
                                     } else {
                                         var info_text = document.createElement("div");
                                         info_text.innerHTML = "Va rugam asteptati raspunsul serverului...";
-                                        swal.fire({
+                                        Swal.fire({
                                             title: 'Se incarca!',
                                             html: info_text,
                                             icon: 'info',
@@ -926,7 +926,7 @@
                                             });
                                         };
                                         start().then(function () {
-                                            swal.close();
+                                            Swal.close();
                                             $(e.currentTarget.form).submit();
                                         });
                                     }
@@ -1200,7 +1200,7 @@
                     if ($(this).hasClass('reissue')) {
                         attention_text = document.createElement("div");
                         attention_text.innerHTML = "Comanda a fost deja facturata in SmartBill.<br/>Inainte de reemitere va recomandam sa anulati sau sa stergeti documentul emis anterior.";
-                        swal.fire({
+                        Swal.fire({
                             title: "Atentie!",
                             html: attention_text,
                             icon: 'warning',
@@ -1224,10 +1224,10 @@
                         });
                     }
                 } catch (e) {
-                    swal.close();
+                    Swal.close();
                     attention_text = document.createElement("div");
                     attention_text.innerHTML = e.responseText;
-                    swal.fire({
+                    Swal.fire({
                         title: "Atentie!",
                         html: attention_text,
                         buttonsStyling: true,
@@ -1310,7 +1310,7 @@
             var info_text = document.createElement("div");
             info_text.innerHTML = "Va rugam asteptati raspunsul serverului...";
             if (true == show_toast) {
-                swal.fire({
+                Swal.fire({
                     title: 'Se incarca!',
                     html: info_text,
                     icon: 'info', 
@@ -1342,7 +1342,7 @@
                     errorMessages.push("Eroare! " + span.innerText.replace("Smart Bill", "SmartBill").replace("SmartBill Cloud", "SmartBill"));
                 }
                 if (true == show_toast) {
-                    swal.close();
+                    Swal.close();
                 }
                 saveMessages();
                 return successMessages;
@@ -1368,7 +1368,7 @@
             if (true == show_toast) {
                 var info_text = document.createElement("div");
                 info_text.innerHTML = "Va rugam asteptati raspunsul serverului...";
-                swal.fire({
+                Swal.fire({
                     title: 'Se incarca!',
                     html: info_text,
                     icon: 'info',
@@ -1392,7 +1392,7 @@
                     $('#smartbill-woocommerce-invoice-button').css('outline-offset', '0');
 
                     if (true == show_toast) {
-                        swal.close();
+                        Swal.close();
                     }
 
                     if ('undefine' != typeof catch_all && catch_all) {
@@ -1416,7 +1416,7 @@
                     span.innerHTML = decodeHTMLEntities(response.message);
 
                     if (true == show_toast) {
-                        swal.close();
+                        Swal.close();
                     }
 
                     //Additional changes to the succes/error messages.
