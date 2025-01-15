@@ -346,6 +346,14 @@ class Smartbill_Woocommerce_Admin_Settings_Fields {
 				);
 
 				add_settings_field(
+					'smartbill_plugin_options_settings_custom_cnp_field',
+					__( 'Afiseaza CNP pentru persoanele fizice la checkout', 'smartbill-woocommerce' ),
+					array( $this, 'display_custom_cnp_field' ),
+					'smartbill_plugin_settings',
+					'smartbill_plugin_settings_documents'
+				);
+
+				add_settings_field(
 					'smartbill_plugin_options_settings_custom_checkout',
 					__( 'Ofera posibilitatea facturarii pe persoana juridica la checkout', 'smartbill-woocommerce' ),
 					array( $this, 'display_custom_checkout' ),
@@ -1706,6 +1714,40 @@ class Smartbill_Woocommerce_Admin_Settings_Fields {
 		return $selected_custom_checkout;
 	}
 
+	public function get_custom_cnp_field(){
+		$options = get_option( 'smartbill_plugin_options_settings' );
+		if ( ! empty( $options ) && is_array( $options ) && isset( $options['custom_cnp_field'] ) ) {
+			$custom_cnp_field = $options['custom_cnp_field'];
+		} else {
+			$custom_cnp_field = false;
+		}
+		return $custom_cnp_field;
+	}
+
+
+	/**
+	 * Get setting value for displaying CNP field on checkout
+	 *
+	 * @return void
+	 */
+	public function display_custom_cnp_field(){
+		$custom_cnp_field = $this->get_custom_cnp_field();
+
+		$options = array(
+			true  => esc_attr__( 'Da', 'smartbill-woocommerce' ),
+			false => esc_attr__( 'Nu', 'smartbill-woocommerce' ),
+		);
+
+		echo '<select class="smartbill-settings-size" name="smartbill_plugin_options_settings[custom_cnp_field]">';
+		foreach ( $options as $status => $label ) {
+			echo '<option value="' . esc_attr( $status ) . '" ' . ( $custom_cnp_field == $status ? 'selected' : '' ) . '>' . esc_attr( $label ) . '</option>';
+		}
+		echo '</select>';
+		echo '<p class="description">' . esc_attr__( 'Cand setarea e "Nu", campul CNP nu se afiseaza dar pe factura se completeaza cu 13 de 0.', 'smartbill-woocommerce' ) . '</p>';
+		echo '<p class="description">' . esc_attr__( 'Cand setarea e "Da", se afiseaza campul CNP ca optional. Daca nu e completat de client, pe factura se completeaza 13 de 0.', 'smartbill-woocommerce' ) . '</p>';
+		echo '<p class="description">' . esc_attr__( 'Completarea cu 13 de 0 a campului CNP este necesara pentru validarea e-Facturii in SPV.', 'smartbill-woocommerce' ) . '</p>';
+	}
+
 	/**
 	 * Dispaly custom checkout select field
 	 *
@@ -1801,6 +1843,7 @@ class Smartbill_Woocommerce_Admin_Settings_Fields {
 			} else {
 				$custom_checkout_options['reg_com_vis'] = true;
 			}
+
 		} else {
 			$custom_checkout_options['client_type_trans']        = esc_attr__( 'Tip Client', 'smartbill-woocommerce' );
 			$custom_checkout_options['client_individual_trans']  = esc_attr__( 'Persoana fizica', 'smartbill-woocommerce' );

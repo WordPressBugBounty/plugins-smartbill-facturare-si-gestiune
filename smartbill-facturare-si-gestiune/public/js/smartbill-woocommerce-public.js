@@ -19,11 +19,13 @@
                 //Hide/show billing fields. 
                 if ('pj' == $("#smartbill_billing_type").val()) {
                     $("#billing_company_field").css("display", 'none');
+                    $("#smartbill_billing_cnp_field").css("display", 'none');
                 }
                 if ('pf' == $("#smartbill_billing_type").val()) {
                     $("#smartbill_billing_cif_field").css("display", 'none');
                     $("#smartbill_billing_company_name_field").css("display", 'none');
                     $("#smartbill_billing_nr_reg_com_field").css("display", 'none');
+                    $("#smartbill_billing_cnp_field").css("display", 'block');
                 }
                 $("#smartbill_billing_type").change(function () {
                     if ('pj' == $(this).val()) {
@@ -31,22 +33,26 @@
                         $("#smartbill_billing_cif_field").css("display", 'block');
                         $("#smartbill_billing_company_name_field").css("display", 'block');
                         $("#smartbill_billing_nr_reg_com_field").css("display", 'block');
+                        $("#smartbill_billing_cnp_field").css("display", 'none');
                     } else {
                         $("#billing_company_field").css("display", 'block');
                         $("#smartbill_billing_cif_field").css("display", 'none');
                         $("#smartbill_billing_company_name_field").css("display", 'none');
                         $("#smartbill_billing_nr_reg_com_field").css("display", 'none');
+                        $("#smartbill_billing_cnp_field").css("display", 'block');
                     }
                 });
 
                 //Hide/show shipping fields. 
                 if ('pj' == $("#smartbill_shipping_type").val()) {
                     $("#shipping_company_field").css("display", 'none');
+                    $("#smartbill_shipping_cnp_field").css("display", 'none');
                 }
                 if ('pf' == $("#smartbill_shipping_type").val()) {
                     $("#smartbill_shipping_cif_field").css("display", 'none');
                     $("#smartbill_shipping_company_name_field").css("display", 'none');
                     $("#smartbill_shipping_nr_reg_com_field").css("display", 'none');
+                    $("#smartbill_shipping_cnp_field").css("display", 'block');
                 }
                 $("#smartbill_shipping_type").change(function () {
                     if ('pj' == $(this).val()) {
@@ -54,11 +60,13 @@
                         $("#smartbill_shipping_cif_field").css("display", 'block');
                         $("#smartbill_shipping_company_name_field").css("display", 'block');
                         $("#smartbill_shipping_nr_reg_com_field").css("display", 'block');
+                        $("#smartbill_shipping_cnp_field").css("display", 'none');
                     } else {
                         $("#shipping_company_field").css("display", 'block');
                         $("#smartbill_shipping_cif_field").css("display", 'none');
                         $("#smartbill_shipping_company_name_field").css("display", 'none');
                         $("#smartbill_shipping_nr_reg_com_field").css("display", 'none');
+                        $("#smartbill_shipping_cnp_field").css("display", 'block');
                     }
                 });
 
@@ -70,17 +78,20 @@
                             $("#smartbill_shipping_cif_field").css("display", 'block');
                             $("#smartbill_shipping_company_name_field").css("display", 'block');
                             $("#smartbill_shipping_nr_reg_com_field").css("display", 'block');
+                            $("#smartbill_shipping_cnp_field").css("display", 'none');
                         } else {
                             $("#shipping_company_field").css("display", 'block');
                             $("#smartbill_shipping_cif_field").css("display", 'none');
                             $("#smartbill_shipping_company_name_field").css("display", 'none');
                             $("#smartbill_shipping_nr_reg_com_field").css("display", 'none');
+                            $("#smartbill_shipping_cnp_field").css("display", 'block');
                         }
 
                         $("#smartbill_shipping_type option[value='" + $('#smartbill_billing_type').find(":selected").val() + "']").prop('selected', true);
                         $('#smartbill_shipping_cif').val($('#smartbill_billing_cif').val());
                         $('#smartbill_shipping_company_name').val($('#smartbill_billing_company_name').val());
                         $('#smartbill_shipping_nr_reg_com').val($('#smartbill_billing_nr_reg_com').val());
+                        $('#smartbill_shipping_cnp').val($('#smartbill_billing_cnp').val());
                     }
                 });
 

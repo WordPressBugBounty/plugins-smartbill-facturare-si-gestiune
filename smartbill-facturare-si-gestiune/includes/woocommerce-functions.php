@@ -260,7 +260,11 @@ function smartbill_create_client_details( $order_id ) {
 		$smartbill_client['iban'] = empty($smartbill_cont_banca) ? '' : $smartbill_cont_banca;
 		$smartbill_client['bank'] = empty($smartbill_banca) ? '' : $smartbill_banca;
 	} else {
-		$vat_code     = '';
+		$cnp   = get_post_meta( $order_id, 'smartbill_billing_cnp', true );
+		if(empty($cnp) || !preg_match("/^(\d{13})$/", $cnp)){
+			$cnp="0000000000000";
+		}
+		$vat_code     = $cnp;
 		$first_name   = $order->get_billing_first_name();
 		$last_name    = $order->get_billing_last_name();
 		$invoice_name = $first_name . ' ' . $last_name;

@@ -1,7 +1,7 @@
 === SmartBill Facturare si Gestiune ===
 Requires at least: 4.7.0
 Tested up to: 6.7.0
-Stable tag: 3.3.6
+Stable tag: 3.3.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -55,6 +55,8 @@ Te rugam sa ne contactezi la plugins@smartbill.ro.
 
 == Changelog ==
 
+= 3.3.7 =
+* Add - Posibilitate adaugare camp CNP pe checkout
 
 = 3.3.6 =
 * Fix - Corectii la libraria SweetAlert pentru a preveni conflicte

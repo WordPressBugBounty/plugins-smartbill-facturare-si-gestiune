@@ -241,6 +241,8 @@ class Smartbill_Woocommerce {
 		$this->loader->add_action( 'woocommerce_order_status_changed', $plugin_public, 'smartbill_woocommerce_automatically_issue_document_by_status', 10, 3 );
 
 		$this->loader->add_action( 'rest_api_init', $plugin_public, 'smartbill_sync_stock_route', 10, 0 );
+		// woocommerce blocks
+		// $this->loader->add_action('woocommerce_init',  $plugin_public,'smartbill_custom_billing_fields_blocks');
 	}
 
 	/**
