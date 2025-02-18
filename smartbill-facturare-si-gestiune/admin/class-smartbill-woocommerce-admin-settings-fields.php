@@ -354,6 +354,14 @@ class Smartbill_Woocommerce_Admin_Settings_Fields {
 				);
 
 				add_settings_field(
+					'smartbill_plugin_options_settings_custom_bc_check',
+					__( 'Verificare localitate la checkout pentru clientii din Bucuresti', 'smartbill-woocommerce' ),
+					array( $this, 'display_custom_bc_check' ),
+					'smartbill_plugin_settings',
+					'smartbill_plugin_settings_documents'
+				);
+
+				add_settings_field(
 					'smartbill_plugin_options_settings_custom_checkout',
 					__( 'Ofera posibilitatea facturarii pe persoana juridica la checkout', 'smartbill-woocommerce' ),
 					array( $this, 'display_custom_checkout' ),
@@ -1714,6 +1722,11 @@ class Smartbill_Woocommerce_Admin_Settings_Fields {
 		return $selected_custom_checkout;
 	}
 
+	/**
+	 * Get enable "add custom cnp field" setting value
+	 *
+	 * @return boolean
+	 */
 	public function get_custom_cnp_field(){
 		$options = get_option( 'smartbill_plugin_options_settings' );
 		if ( ! empty( $options ) && is_array( $options ) && isset( $options['custom_cnp_field'] ) ) {
@@ -1746,6 +1759,45 @@ class Smartbill_Woocommerce_Admin_Settings_Fields {
 		echo '<p class="description">' . esc_attr__( 'Cand setarea e "Nu", campul CNP nu se afiseaza dar pe factura se completeaza cu 13 de 0.', 'smartbill-woocommerce' ) . '</p>';
 		echo '<p class="description">' . esc_attr__( 'Cand setarea e "Da", se afiseaza campul CNP ca optional. Daca nu e completat de client, pe factura se completeaza 13 de 0.', 'smartbill-woocommerce' ) . '</p>';
 		echo '<p class="description">' . esc_attr__( 'Completarea cu 13 de 0 a campului CNP este necesara pentru validarea e-Facturii in SPV.', 'smartbill-woocommerce' ) . '</p>';
+	}
+
+	
+	/**
+	 * Get enable Bucharest check setting value
+	 *
+	 * @return boolean
+	 */
+	public function get_custom_bc_check(){
+		$options = get_option( 'smartbill_plugin_options_settings' );
+		if ( ! empty( $options ) && is_array( $options ) && isset( $options['custom_bc_check'] ) ) {
+			$custom_bc_check = $options['custom_bc_check'];
+		} else {
+			$custom_bc_check = false;
+		}
+		return $custom_bc_check;
+	}
+
+
+	/**
+	 * Get setting value for displaying CNP field on checkout
+	 *
+	 * @return void
+	 */
+	public function display_custom_bc_check(){
+		$custom_bc_check = $this->get_custom_bc_check();
+
+		$options = array(
+			true  => esc_attr__( 'Da', 'smartbill-woocommerce' ),
+			false => esc_attr__( 'Nu', 'smartbill-woocommerce' ),
+		);
+
+		echo '<select class="smartbill-settings-size" name="smartbill_plugin_options_settings[custom_bc_check]">';
+		foreach ( $options as $status => $label ) {
+			echo '<option value="' . esc_attr( $status ) . '" ' . ( $custom_bc_check == $status ? 'selected' : '' ) . '>' . esc_attr( $label ) . '</option>';
+		}
+		echo '</select>';
+		echo '<p class="description">' . esc_attr__( 'Cand setarea este "Da", pentru clientii din Bucuresti se verifica daca Localitatea este completata conform standardelor ANAF: ea trebuie sa contina unul din sectoarele 1-6.', 'smartbill-woocommerce' ) . '</p>';
+		echo '<p class="description">' . esc_attr__( 'Se va afisa o eroare daca judetul este Bucuresti si localitatea nu este unul din sectoarele 1-6.', 'smartbill-woocommerce' ) . '</p>';
 	}
 
 	/**

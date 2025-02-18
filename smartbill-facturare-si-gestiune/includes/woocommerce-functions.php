@@ -214,7 +214,13 @@ function smartbill_create_client_details( $order_id ) {
 	$wc_counties = $wc_countries->get_states( $country );
 	$county      = '';
 	$county_code = $order->get_billing_state();
-
+	
+	if(true == get_post_meta($order_id, 'custom_bc_check')){
+		if(isset($country) && $country=="RO" && isset($county_code) && $county_code =="B"){
+			$city=trim(strtolower(preg_replace('/[^A-Za-z0-9]/', '' ,$city)));
+		}
+	}
+	
 	if ( isset( $wc_counties[ $county_code ] ) ) {
 		$county = $wc_counties[ $county_code ];
 		$county = remove_accents( html_entity_decode( $county ) );

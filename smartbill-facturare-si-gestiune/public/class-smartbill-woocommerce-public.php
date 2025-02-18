@@ -77,6 +77,11 @@ class Smartbill_Woocommerce_Public {
 		} else {
 			$billing['billing'] = false;
 		}
+		if ( isset( $options['custom_checkout'] ) && $options['custom_checkout'] && is_checkout() ) {
+			$billing['loc_checks'] = $options['custom_bc_check'];
+		} else {
+			$billing['loc_checks'] = false;
+		}
 
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/smartbill-woocommerce-public.js', array( 'jquery' ), $this->version, false );
 		wp_localize_script( $this->plugin_name, 'smartbill_billing', $billing );
@@ -248,6 +253,23 @@ class Smartbill_Woocommerce_Public {
 			}
 
 		}
+		if(true == $admin_settings->get_custom_bc_check()){
+			$sectors=[
+				"sector1", "sector2", "sector3", "sector4", "sector5", "sector6", 
+				"1", "2", "3", "4", "5", "6", "s1", "s2", "s3", "s4", "s5", "s6",
+				"sec1","sec2","sec3","sec4","sec5","sec6",
+				"sect1","sect2","sect3","sect4","sect5","sect6"
+			]; 
+			if(isset($fields['billing_country']) && $fields['billing_country']=="RO" && isset($fields['billing_state']) && $fields['billing_state'] =="B"){
+				$temp_billing_state = trim(strtolower(preg_replace('/[^A-Za-z0-9]/', '',filter_var($fields['billing_city'],FILTER_SANITIZE_FULL_SPECIAL_CHARS))));
+
+				if(!in_array($temp_billing_state , $sectors) ){
+					$errors->add( "billing_city", esc_attr__("Daca judetul este Bucuresti, atunci Localitatea trebuie sa fie de tipul Sector1, Sector2 etc.", 'smartbill-woocommerce' ));
+				}
+			}
+		
+		}
+
 		return $fields;
 	}
 

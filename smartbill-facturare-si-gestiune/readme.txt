@@ -1,7 +1,7 @@
 === SmartBill Facturare si Gestiune ===
 Requires at least: 4.7.0
 Tested up to: 6.7.0
-Stable tag: 3.3.7
+Stable tag: 3.3.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -54,6 +54,10 @@ Dupa prima configurare a modulului recomandam activarea optiunii “Emite ciorna
 Te rugam sa ne contactezi la plugins@smartbill.ro.
 
 == Changelog ==
+
+= 3.3.8 =
+* Add - Adaugare configurare noua: Verificare localitate la checkout pentru clientii din Bucuresti
+* Add - Compatibilitate cu WooCommerce 9.7.0
 
 = 3.3.7 =
 * Add - Posibilitate adaugare camp CNP pe checkout

@@ -12,9 +12,52 @@
     */
     $(document).ready(function () {
         try {
+            let sectors = [
+                "sector1", "sector2", "sector3", "sector4", "sector5", "sector6",
+                "1", "2", "3", "4", "5", "6", "s1", "s2", "s3", "s4", "s5", "s6",
+                "sec1", "sec2", "sec3", "sec4", "sec5", "sec6",
+                "sect1", "sect2", "sect3", "sect4", "sect5", "sect6"
+            ]; 
+            if ($('select#billing_state').val() == "B" && $('select#billing_country').val() == "RO") {
+                if ($('input#billing_city').val() != "" && smartbill_billing.loc_checks === "1") {
+                    if (!sectors.includes($('input#billing_city').val().replace(/[^A-Za-z0-9]/g, '').toLowerCase())){
+                        $('input#billing_city').val("");
+                    }
+                }
+                $('input#billing_city').attr("placeholder", "Sector 1, Sector 2 etc.");
+            } 
+
+            $('select#billing_state').on('change', function (e) {
+                if (this.value == "B" && $('select#billing_country').val() == "RO") {
+                    if ($('input#billing_city').val() != "" && smartbill_billing.loc_checks === "1") {
+                        if (!sectors.includes($('input#billing_city').val().replace(/[^A-Za-z0-9]/g, '').toLowerCase())) {
+                            $('input#billing_city').val("");
+                        }
+                    }
+                    $('input#billing_city').attr("placeholder", "Sector 1, Sector 2 etc.");
+                }else{
+                    $('input#billing_city').attr("placeholder", "");
+                }
+
+            });
+
+            $('select#billing_country').on('change', function (e) {
+                if (this.value == "B" && $('select#billing_country').val() == "RO") {
+                    if ($('input#billing_city').val() != "" && smartbill_billing.loc_checks === "1") {
+                        if (!sectors.includes($('input#billing_city').val().replace(/[^A-Za-z0-9]/g, '').toLowerCase())) {
+                            $('input#billing_city').val("");
+                        }
+                    }
+                    $('input#billing_city').attr("placeholder", "Sector 1, Sector 2 etc.");
+                } else {
+                    $('input#billing_city').attr("placeholder", "");
+                }
+
+            });
+
 
             //Check if smartbill setting is enabled.
-            if (smartbill_billing) {
+            if (smartbill_billing.billing === "1") {
 
                 //Hide/show billing fields. 
                 if ('pj' == $("#smartbill_billing_type").val()) {
