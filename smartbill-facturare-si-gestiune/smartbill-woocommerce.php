@@ -16,7 +16,7 @@
  * Plugin Name:       SmartBill Facturare si Gestiune
  * Plugin URI:        https://www.smartbill.ro/resurse/integrari
  * Description:       Acest modul permite emiterea facturilor in SmartBill Cloud pentru WooCommerce 3.0 - 9.7.0, WordPress 4.7.0 - 6.7.0
- * Version:           3.3.8
+ * Version:           3.3.9
  * Author:            smarbill.ro
  * Author URI:        https://www.smartbill.ro
  * License:           GPL-2.0+
@@ -38,7 +38,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define( 'SMARTBILL_PLUGIN_VERSION', '3.3.8' );
+define( 'SMARTBILL_PLUGIN_VERSION', '3.3.9' );
 
 /**
  * The code that runs during plugin activation.
