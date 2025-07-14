@@ -12,7 +12,7 @@
  * @copyright  Intelligent IT SRL 2018-2022
  */
 class ANAFAPIClient {
-	const ANAF_API_URL = 'https://webservicesp.anaf.ro/PlatitorTvaRest/api/v8/ws/tva';
+	const ANAF_API_URL = 'https://webservicesp.anaf.ro/api/PlatitorTvaRest/v9/tva';
 
 	/**
 	 * Function that calls an endpoint using 

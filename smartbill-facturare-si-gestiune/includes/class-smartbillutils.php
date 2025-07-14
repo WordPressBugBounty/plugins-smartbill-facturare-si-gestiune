@@ -696,10 +696,21 @@ class SmartBillUtils {
 				$line_item = $order_item['line_subtotal'];
 				$line_tax  = $order_item['line_subtotal_tax'];
 			}
+			
 			$order_tax = null;
-			foreach($order->get_items('tax') as $order_rate_id => $order_rate){
-				if($order_rate->get_rate_id() == key($order_item->get_taxes()['subtotal'])){
-					$order_tax = $order_rate;
+			$tax_subtotals = $order_item->get_taxes()['subtotal'];
+
+			// Look for the tax rate that was actually applied (has a numeric amount or zero)
+			foreach ($tax_subtotals as $tax_rate_id => $amount) {
+				// Check for a valid amount (zero is also valid!)
+				if (is_numeric($amount)) {
+					// Now match this tax rate ID to the order-level tax items
+					foreach ($order->get_items('tax') as $order_tax_item) {
+						if ($order_tax_item->get_rate_id() == $tax_rate_id) {
+							$order_tax = $order_tax_item;
+							break 2; // Exit both loops
+						}
+					}
 				}
 			}
 
@@ -1171,7 +1182,7 @@ class SmartBillUtils {
 
 			$result['taxName']       = $tax_name;
 			$result['taxPercentage'] = $tax_percentage;
-			
+
 			if(0 === $price_with_vat && "0" === $price_without_vat && !is_null($order_tax) ){
 				foreach ( $vat_rates as $tax ) {
 					if(strtolower($order_tax->get_label()) == strtolower($tax['name'])){

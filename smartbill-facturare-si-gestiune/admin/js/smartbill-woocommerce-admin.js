@@ -399,6 +399,7 @@
                                 }
                                 var payload = {
                                     data: {
+                                        type:2,
                                         order_id: smartbill.post_id
                                     },
                                     security: smartbill.security,
@@ -538,6 +539,7 @@
                                         }
                                         var payload = {
                                             data: {
+                                                type:3,
                                                 order_id: order_id,
                                                 is_first: is_first
                                             },
@@ -590,6 +592,7 @@
                                     }
                                     var payload = {
                                         data: {
+                                            type:4,
                                             order_id: order_id,
                                             is_first: is_first
                                         },
@@ -655,6 +658,7 @@
                                     }
                                     var payload = {
                                         data: {
+                                            type:5,
                                             order_id: order_id,
                                             is_first: is_first
                                         },
@@ -722,6 +726,7 @@
                                             }
                                             var payload = {
                                                 data: {
+                                                    type:6,
                                                     order_id: order_id,
                                                     is_first: is_first
                                                 },
@@ -766,6 +771,7 @@
                                         }
                                         var payload = {
                                             data: {
+                                                type:7,
                                                 order_id: order_id,
                                                 is_first: is_first
                                             },
@@ -818,6 +824,7 @@
                                         }
                                         var payload = {
                                             data: {
+                                                type:8,
                                                 order_id: order_id,
                                                 is_first: is_first
                                             },
@@ -907,6 +914,7 @@
                                                 }
                                                 var payload = {
                                                     data: {
+                                                        type:9,
                                                         order_id: order_id,
                                                         is_first: is_first
                                                     },
@@ -1188,6 +1196,7 @@
 
                     var payload = {
                         data: {
+                            type:10,
                             order_id: smartbill.post_id
                         },
                         security: smartbill.security,

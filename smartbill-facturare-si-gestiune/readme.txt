@@ -55,6 +55,11 @@ Te rugam sa ne contactezi la plugins@smartbill.ro.
 
 == Changelog ==
 
+= 3.4.2 =
+* Add - Compatibilitate cu WooCommerce 9.9.5
+* Fix - Corecteaza preluarea cotelor de TVA
+* Add - Adaugarea mesajelor de eroare in notele comenzii cand factura este emisa manual
+
 = 3.3.9 =
 * Fix - Modifica verificari setare "Verificare localitate la checkout pentru clientii din Bucuresti"
 

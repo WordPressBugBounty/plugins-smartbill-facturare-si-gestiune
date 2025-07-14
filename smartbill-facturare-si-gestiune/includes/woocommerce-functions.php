@@ -157,14 +157,15 @@ function smartbill_woocommerce_issue_document() {
 	check_ajax_referer( 'smartbill_nonce', 'security' );
 	if ( isset( $_POST['data'] ) && isset( $_POST['data']['order_id'] ) ) {
 		$order_id = (int) sanitize_text_field( wp_unslash( $_POST['data']['order_id'] ) );
+		$type = (int) isset($_POST['data']['type'])? $_POST['data']['type']:99; 
 		if ( ! is_numeric( $order_id ) || ( $order_id <= 0 ) ) {
 			$return['status']  = false;
 			$return['message'] = __( 'Comanda furnizata este invalida', 'smartbill-woocommerce' );
 		} elseif ( isset( $is_first ) ) {
 			$is_first = filter_var( $data['is_first'], FILTER_VALIDATE_BOOLEAN );
-			$return   = smartbill_create_document( $order_id, $is_first );
+			$return   = smartbill_create_document( $type, $order_id, $is_first );
 		} else {
-			$return = smartbill_create_document( $order_id );
+			$return = smartbill_create_document( $type, $order_id );
 		}
 	} else {
 		$return['status']  = false;
@@ -416,8 +417,9 @@ function smartbill_send_document_mail( $order_id ) {
  *
  * @return response $return
  */
-function smartbill_create_document( $order_id, $get_um = true ) {
+function smartbill_create_document($type, $order_id, $get_um = true ) {
 	try {
+		$return=[];
 		$order      = new WC_Order( $order_id );
 		$order_meta = get_post_meta( $order_id );
 
@@ -490,7 +492,7 @@ function smartbill_create_document( $order_id, $get_um = true ) {
 		if ( empty( $delivery_days ) ) {
 			$delivery_days = 0;
 		}
-
+		
 		$company_vat_code = $login_options['vat_code'];
 		$currency         = trim( $document_settings['currency'] );
 		$document_date    = gmdate( 'Y-m-d' );
@@ -574,6 +576,7 @@ function smartbill_create_document( $order_id, $get_um = true ) {
 				$smartbill_invoice['paymentTotal']  = 0;
 			}
 		}
+		$smartbill_invoice['ecommercePluginInfo']["acctionType"] = $type;
 
 		$client = new SmartBill_Cloud_REST_Client( $login_options['username'], $login_options['password'] );
 		$client->set_woocommerce_order_id( $order_id );
@@ -611,7 +614,9 @@ function smartbill_create_document( $order_id, $get_um = true ) {
 			$return['message'] = $server_call['message'];
 			$return['error']   = $server_call['errorText'];
 			$return['headers'] = $server_call['get_headers'];
+			$order->add_order_note(sprintf(_( '[%1$s] Eroare! Documentul SmartBill nu a fost creat.', 'smartbill-woocommerce' ),$type));
 		} else {
+			$order->add_order_note( sprintf( __('[%1$s] Documentul SmartBill %2$s %3$s a fost creat.', 'smartbill-woocommerce' ), $type, $return['series'], $return['number'] ) );
 			$return['status']  = true;
 			$return['headers'] = $server_call['get_headers'];
 			if ( isset( $server_call['number'] ) && ( $server_call['number'] ) ) {
@@ -627,15 +632,14 @@ function smartbill_create_document( $order_id, $get_um = true ) {
 					$invoice_logger->set_data( $order_id, 'smartbill_series', $server_call['series'] );
 				}
 				$invoice_logger->set_data( $order_id, 'smartbill_document_url', $server_call['documentUrl'] );
-				$invoice_logger->set_data( $order_id, 'smartbill_status', Smartbill_Woocommerce_Settings::SMARTBILL_DATABASE_INVOICE_STATUS_DRAFT )->save( $order_id );
-				$invoice_logger->set_data( $order_id, 'smartbill_view_document_url', $server_call['documentViewUrl'] );
+				$invoice_logger->set_data( $order_id, 'smartbill_status', Smartbill_Woocommerce_Settings::SMARTBILL_DATABASE_INVOICE_STATUS_DRAFT );
+				$invoice_logger->set_data( $order_id, 'smartbill_view_document_url', $server_call['documentViewUrl'] )->save( $order_id );
 				$return['message'] = __( 'Operatiunea s-a desfasurat cu succes: ', 'smartbill-woocommerce' ) . $server_call['message'];
 			}
 			$return['number'] = $server_call['number'];
 			$return['series'] = $server_call['series'];
 			$return['status'] = true;
 			/* translators: Variables `series` and `number` are document info */
-			$order->add_order_note( sprintf( __( 'Documentul SmartBill %1$s %2$s a fost creat.', 'smartbill-woocommerce' ), $return['series'], $return['number'] ) );
 			if ( '1' == $send_mail_with_document ) {
 				if ( ! empty( $cc_bcc['cc'] ) ) {
 					$cc_bcc['cc'] = ', ' . $cc_bcc['cc'];}
@@ -647,9 +651,12 @@ function smartbill_create_document( $order_id, $get_um = true ) {
 			}
 		}
 	} catch ( Exception $e ) {
+		$return=[];
+		$order             = new WC_Order( $order_id );
 		$return['error']   = $e->getMessage();
 		$return['message'] = $e->getMessage();
 		$return['status']  = false;
+		$order->add_order_note(sprintf(_( '[%1$s] A aparut o eroare la emiterea documentului SmartBill! ', 'smartbill-woocommerce' ), $type));
 	}
 
 	if ( ! empty( $server_call['documentUrl'] ) ) {

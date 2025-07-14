@@ -365,6 +365,8 @@ class SmartBill_Cloud_REST_Client {
 	private function set_plugin_information( $data, $debug_mode = false ) {
 		// plugin info.
 		global $woocommerce;
+		$type = $data['ecommercePluginInfo']['acctionType']; 
+		unset($data['ecommercePluginInfo']['acctionType']);
 		$data['ecommercePluginInfo']['platformName']    = 'WordPress';
 		$data['ecommercePluginInfo']['platformVersion'] = $GLOBALS['wp_version'] . '/' . $woocommerce->version;
 		$data['ecommercePluginInfo']['sbPluginVersion'] = SMARTBILL_PLUGIN_VERSION;
@@ -391,6 +393,8 @@ class SmartBill_Cloud_REST_Client {
 			}
 		}
 		$data['ecommercePluginInfo']['details']->{'order_id'} = $this->get_woocommerce_order_id();
+		$data['ecommercePluginInfo']['details']->{'acction_type'} = $type;
+		
 		return $data;
 	}
 

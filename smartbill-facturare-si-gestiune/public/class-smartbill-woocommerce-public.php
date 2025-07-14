@@ -640,14 +640,7 @@ class Smartbill_Woocommerce_Public {
 					//Check if order has invoice. 
 					$smartbill_private_link = get_post_meta($id, 'smartbill_private_link');
 					if ( empty( $smartbill_private_link ) ) {
-						$return = smartbill_create_document( $id );
-						if ( ! $return['status'] ) {
-							$order = wc_get_order( $id );
-							// The text for the note.
-							$note = __( 'Eroare! ', 'smartbill-woocommerce' ) . $return['error'];
-							// Add the note.
-							$order->add_order_note( $note );
-						}
+						$return = smartbill_create_document( 1, $id );
 					}
 				}
 			}
