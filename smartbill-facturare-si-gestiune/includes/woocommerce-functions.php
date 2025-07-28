@@ -614,9 +614,9 @@ function smartbill_create_document($type, $order_id, $get_um = true ) {
 			$return['message'] = $server_call['message'];
 			$return['error']   = $server_call['errorText'];
 			$return['headers'] = $server_call['get_headers'];
-			$order->add_order_note(sprintf(_( '[%1$s] Eroare! Documentul SmartBill nu a fost creat.', 'smartbill-woocommerce' ),$type));
+			$order->add_order_note(sprintf(__( '[%1$s] Eroare! Documentul SmartBill nu a fost creat.', 'smartbill-woocommerce' ),$type));
 		} else {
-			$order->add_order_note( sprintf( __('[%1$s] Documentul SmartBill %2$s %3$s a fost creat.', 'smartbill-woocommerce' ), $type, $return['series'], $return['number'] ) );
+			$order->add_order_note( sprintf( __('[%1$s] Documentul SmartBill %2$s %3$s a fost creat.', 'smartbill-woocommerce' ), $type, $server_call['series'], $server_call['number'] ) );
 			$return['status']  = true;
 			$return['headers'] = $server_call['get_headers'];
 			if ( isset( $server_call['number'] ) && ( $server_call['number'] ) ) {
@@ -656,7 +656,7 @@ function smartbill_create_document($type, $order_id, $get_um = true ) {
 		$return['error']   = $e->getMessage();
 		$return['message'] = $e->getMessage();
 		$return['status']  = false;
-		$order->add_order_note(sprintf(_( '[%1$s] A aparut o eroare la emiterea documentului SmartBill! ', 'smartbill-woocommerce' ), $type));
+		$order->add_order_note(sprintf(__( '[%1$s] A aparut o eroare la emiterea documentului SmartBill! ', 'smartbill-woocommerce' ), $type));
 	}
 
 	if ( ! empty( $server_call['documentUrl'] ) ) {
