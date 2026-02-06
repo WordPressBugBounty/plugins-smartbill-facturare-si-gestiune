@@ -193,13 +193,13 @@ class Smartbill_Woocommerce_Admin {
 						wp_localize_script( $this->plugin_name, 'smartbill_export', $export_options );
 					}
 				
-					if (!wp_script_is('toastify', 'registered')) {
+					if (!wp_script_is('toastify', 'enqueued')) {
 						wp_enqueue_script( 'toastify', plugin_dir_url( __FILE__ ) . ( 'js/toastify.js' ), array( 'jquery' ), $this->version, false );
 					}
-					if (!wp_script_is('select2', 'registered')) {
+					if ( ! wp_script_is( 'select2', 'enqueued' ) ) {
 						wp_enqueue_script( 'select2', plugin_dir_url( __FILE__ ) . ( 'js/select2.full.min.js' ), array( 'jquery' ), $this->version, false );
 					}
-					if (!wp_script_is('sweetalert2', 'registered')) {
+					if (!wp_script_is('sweetalert2', 'enqueued')) {
 						wp_enqueue_script( 'sweetalert2', plugin_dir_url( __FILE__ ) . 'js/sweetalert2.all.min.js', array( 'jquery' ), $this->version, false );
 					}
 				}elseif( isset( $post ) && 'shop_order' == $post->post_type ) {
@@ -220,13 +220,13 @@ class Smartbill_Woocommerce_Admin {
 					}
 					wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/smartbill-woocommerce-admin.min.js', array( 'jquery' ), $this->version . time(), false );
 					wp_localize_script( $this->plugin_name, 'smartbill', $smartbill_settings );
-					if (!wp_script_is('toastify', 'registered')) {
+					if (!wp_script_is('toastify', 'enqueued')) {
 						wp_enqueue_script( 'toastify', plugin_dir_url( __FILE__ ) . ( 'js/toastify.js' ), array( 'jquery' ), $this->version, false );
 					}
-					if (!wp_script_is('select2', 'registered')) {
+					if ( ! wp_script_is( 'select2', 'enqueued' ) ) {
 						wp_enqueue_script( 'select2', plugin_dir_url( __FILE__ ) . ( 'js/select2.full.min.js' ), array( 'jquery' ), $this->version, false );
 					}
-					if (!wp_script_is('sweetalert2', 'registered')) {
+					if (!wp_script_is('sweetalert2', 'enqueued')) {
 						wp_enqueue_script( 'sweetalert2', plugin_dir_url( __FILE__ ) . 'js/sweetalert2.all.min.js', array( 'jquery' ), $this->version, false );
 					}
 				}
@@ -369,13 +369,14 @@ class Smartbill_Woocommerce_Admin {
 	 */
 	public function smartbill_add_billing_fileds_in_admin_order( $order ) {
 		$admin_settings = new Smartbill_Woocommerce_Admin_Settings_Fields();
+		
 		if ( $admin_settings->get_custom_checkout() ) {
 			$id_cif        = 'smartbill_billing_cif';
 			$id_nr_reg_com = 'smartbill_billing_nr_reg_com';
 			$id_cnp 	   = 'smartbill_billing_cnp';
+			$cnp    	   = get_post_meta( $order->get_id(), $id_cnp, true );
 			$cif           = get_post_meta( $order->get_id(), $id_cif, true );
 			$nr_reg_com    = get_post_meta( $order->get_id(), $id_nr_reg_com, true );
-			$cnp    	   = get_post_meta( $order->get_id(), $id_cnp, true );
 			$shipping_type = get_post_meta( $order->get_id(), 'smartbill_billing_type', true );
 
 			?>
@@ -410,16 +411,35 @@ class Smartbill_Woocommerce_Admin {
 				)
 			);
 			woocommerce_wp_text_input(
-				array(
-					'id'    => $id_cnp,
-					'name'  => $id_cnp,
-					'label' => __( 'CNP', 'smartbill_woocommerce' ),
-					'value' => $cnp,
-				)
-			);
+					array(
+						'id'    => $id_cnp,
+						'name'  => $id_cnp,
+						'label' => __( 'CNP', 'smartbill_woocommerce' ),
+						'value' => $cnp,
+					)
+				);
 			?>
 			</div>
 			<?php
+
+			if ($admin_settings->get_custom_cnp_field() && !$admin_settings->get_custom_checkout()){
+			$id_cnp 	   = 'smartbill_billing_cnp';
+			$cnp    	   = get_post_meta( $order->get_id(), $id_cnp, true );
+			?>
+			<div class="edit_address smartbill-order-cnp"">
+			<?php
+				woocommerce_wp_text_input(
+					array(
+						'id'    => $id_cnp,
+						'name'  => $id_cnp,
+						'label' => __( 'CNP', 'smartbill_woocommerce' ),
+						'value' => $cnp,
+					)
+				);
+			?>
+			</div>
+			<?php
+		}
 		}
 	}
 
@@ -432,9 +452,13 @@ class Smartbill_Woocommerce_Admin {
 	 */
 	public function smartbill_add_shipping_fileds_in_admin_order( $order ) {
 		$admin_settings = new Smartbill_Woocommerce_Admin_Settings_Fields();
+		
+		
 		if ( $admin_settings->get_custom_checkout() ) {
 			$id_cif        = 'smartbill_shipping_cif';
 			$id_nr_reg_com = 'smartbill_shipping_nr_reg_com';
+			$id_cnp 	   = 'smartbill_shipping_cnp';
+			$cnp    	   = get_post_meta( $order->get_id(), $id_cnp, true );
 			$cif           = get_post_meta( $order->get_id(), $id_cif, true );
 			$nr_reg_com    = get_post_meta( $order->get_id(), $id_nr_reg_com, true );
 			$shipping_type = get_post_meta( $order->get_id(), 'smartbill_shipping_type', true );
@@ -470,12 +494,21 @@ class Smartbill_Woocommerce_Admin {
 					'value' => $nr_reg_com,
 				)
 			);
+
+			woocommerce_wp_text_input(
+					array(
+						'id'    => $id_cnp,
+						'name'  => $id_cnp,
+						'label' => __( 'CNP', 'smartbill_woocommerce' ),
+						'value' => $cnp,
+					)
+				);
 			?>
 			</div>
 			<?php
 		}
 		
-		if ( $admin_settings->get_custom_cnp_field() ) {
+		if ( $admin_settings->get_custom_cnp_field() &&  !$admin_settings->get_custom_checkout() ) {
 			$id_cnp 	   = 'smartbill_shipping_cnp';
 			$cnp    	   = get_post_meta( $order->get_id(), $id_cnp, true );
 			?>
@@ -660,6 +693,18 @@ class Smartbill_Woocommerce_Admin {
 		$arr[] = '_smartbill_prod_reg_price_excluding_tax';
 		return $arr;
 	}
+
+	/**
+	 * Declared incompatibility with woocommerce blocks, a message will be shown in the Cart & Checkout blocks settings sidebar letting users know.
+	 * 
+	 * @return void
+	 */
+	public function smartbill_declare_blocks_incompatibility() {
+		if ( class_exists( '\Automattic\WooCommerce\Utilities\FeaturesUtil' ) ) {
+			\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('cart_checkout_blocks',
+			 WP_PLUGIN_DIR . '/smartbill-woocommerce.php',false);
+		}
+	} 
 
 	// phpcs: ignore!
 }

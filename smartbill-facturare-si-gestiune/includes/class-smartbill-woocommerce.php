@@ -199,6 +199,7 @@ class Smartbill_Woocommerce {
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'add_menu_pages' );
 		$this->loader->add_action( 'admin_init', $plugin_admin->get_auth_screen(), 'register_fields' );
 		$this->loader->add_action( 'admin_init', $plugin_admin->get_settings_fields(), 'register_fields' );
+		$this->loader->add_action( 'before_woocommerce_init', $plugin_admin, 'smartbill_declare_blocks_incompatibility');
 		$this->loader->add_action( 'woocommerce_admin_order_data_after_billing_address', $plugin_admin, 'smartbill_add_billing_fileds_in_admin_order' );
 		$this->loader->add_action( 'woocommerce_admin_order_data_after_shipping_address', $plugin_admin, 'smartbill_add_shipping_fileds_in_admin_order' );
 		$this->loader->add_action( 'woocommerce_process_shop_order_meta', $plugin_admin, 'smartbill_billing_order_save_fields' );

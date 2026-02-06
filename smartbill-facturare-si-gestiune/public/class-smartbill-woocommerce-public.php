@@ -72,12 +72,12 @@ class Smartbill_Woocommerce_Public {
 		 */
 		$options = get_option( 'smartbill_plugin_options_settings' );
 		$billing = array();
-		if ( isset( $options['custom_checkout'] ) && $options['custom_checkout'] && is_checkout() ) {
+		if ( isset( $options['custom_checkout'] ) && $options['custom_checkout'] && (is_checkout() || is_account_page()) ) {
 			$billing['billing'] = $options['custom_checkout'];
 		} else {
 			$billing['billing'] = false;
 		}
-		if ( isset( $options['custom_bc_check'] ) && $options['custom_bc_check'] && is_checkout() ) {
+		if ( isset( $options['custom_bc_check'] ) && $options['custom_bc_check'] && (is_checkout() || is_account_page()) ) {
 			$billing['loc_checks'] = $options['custom_bc_check'];
 		} else {
 			$billing['loc_checks'] = false;
@@ -112,7 +112,10 @@ class Smartbill_Woocommerce_Public {
 					update_user_meta( $user_id, 'billing_smartbill_billing_nr_reg_com', sanitize_text_field( wp_unslash( $_POST['billing_smartbill_billing_nr_reg_com'] ) ) );
 				}
 			}
-			if ( $user_id && isset( $_POST['billing_smartbill_billing_cnp'] ) ) {
+		}
+		
+		if ( $user_id && isset( $_POST['billing_smartbill_billing_cnp'] ) ) {
+			if (!isset( $_POST['billing_smartbill_billing_type'] ) || (isset( $_POST['billing_smartbill_billing_type'] ) && 'pj' != $_POST['billing_smartbill_billing_type'] )) {
 				update_user_meta( $user_id, 'billing_smartbill_billing_cnp', sanitize_text_field( wp_unslash( $_POST['billing_smartbill_billing_cnp'] ) ) );
 			}
 		}
@@ -171,13 +174,6 @@ class Smartbill_Woocommerce_Public {
 				}
 			}
 
-			if ( isset( $_POST['smartbill_billing_type'] ) && 'pf' == $_POST['smartbill_billing_type'] ) {
-				if ( isset( $_POST['smartbill_billing_cnp'] ) ) {
-					update_post_meta( $order_id, 'smartbill_billing_cnp', sanitize_text_field( wp_unslash( $_POST['smartbill_billing_cnp'] ) ) );
-					$order->update_meta_data( 'smartbill_billing_cnp',trim( sanitize_text_field( wp_unslash( $_POST['smartbill_billing_cnp'] ) ) ) );
-				}
-			}
-
 			if ( isset( $_POST['smartbill_shipping_type'] ) && 'pj' == $_POST['smartbill_shipping_type'] ) {
 				if ( isset( $_POST['smartbill_shipping_nr_reg_com'] ) && isset( $_POST['ship_to_different_address'] ) ) {
 					update_post_meta( $order_id, 'smartbill_shipping_nr_reg_com', sanitize_text_field( wp_unslash( $_POST['smartbill_shipping_nr_reg_com'] ) ) );
@@ -197,15 +193,23 @@ class Smartbill_Woocommerce_Public {
 					$order->set_shipping_company($company_name);
 				}
 			}
-
-			if ( isset( $_POST['smartbill_shipping_type'] ) && 'pf' == $_POST['smartbill_shipping_type'] ) {
-				if ( isset( $_POST['smartbill_shipping_cnp'] ) ) {
-					update_post_meta( $order_id, 'smartbill_shipping_cnp', sanitize_text_field( wp_unslash( $_POST['smartbill_shipping_cnp'] ) ) );
-					$order->update_meta_data( 'smartbill_shipping_cnp',trim( sanitize_text_field( wp_unslash( $_POST['smartbill_shipping_cnp'] ) ) ) );
-				}
-			}
-
 		}
+
+		if ( isset( $_POST['smartbill_billing_cnp'] ) ) {
+			if ( !isset( $_POST['smartbill_billing_type'] ) || ( isset( $_POST['smartbill_billing_type']) && 'pj' != $_POST['smartbill_billing_type'] )) {
+				update_post_meta( $order_id, 'smartbill_billing_cnp', sanitize_text_field( wp_unslash( $_POST['smartbill_billing_cnp'] ) ) );
+				$order->update_meta_data( 'smartbill_billing_cnp',trim( sanitize_text_field( wp_unslash( $_POST['smartbill_billing_cnp'] ) ) ) );
+				
+			}
+		}
+
+		if ( isset( $_POST['smartbill_shipping_cnp'] ) ) {
+			if ( !isset( $_POST['smartbill_shipping_type'] ) || (!isset( $_POST['smartbill_shipping_type'] ) && 'pj' != $_POST['smartbill_shipping_type'] )) {
+				update_post_meta( $order_id, 'smartbill_shipping_cnp', sanitize_text_field( wp_unslash( $_POST['smartbill_shipping_cnp'] ) ) );
+				$order->update_meta_data( 'smartbill_shipping_cnp',trim( sanitize_text_field( wp_unslash( $_POST['smartbill_shipping_cnp'] ) ) ) );
+			}
+		}
+
 		$order->save();
 	}
 
@@ -604,7 +608,7 @@ class Smartbill_Woocommerce_Public {
 	 *
 	 * @return string $address
 	 */
-	public function smartbill_shipping_address_format( $address, $raw_address, $order ) {
+	public function smartbill_shipping_address_format( $address, $raw_address, $order=null ) {
 		$admin_settings = new Smartbill_Woocommerce_Admin_Settings_Fields();
 		if ( $admin_settings->get_custom_checkout() ) {
 			$raw_address['smartbill_shipping_type']       = empty( $raw_address['smartbill_shipping_type'] ) ? '' : $raw_address['smartbill_shipping_type'] . '<br/>';
