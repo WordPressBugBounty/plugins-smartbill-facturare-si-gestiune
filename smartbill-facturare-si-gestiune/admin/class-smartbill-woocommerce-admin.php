@@ -699,10 +699,10 @@ class Smartbill_Woocommerce_Admin {
 	 * 
 	 * @return void
 	 */
-	public function smartbill_declare_blocks_incompatibility() {
+	public function smartbill_declare_compatibilities() {
 		if ( class_exists( '\Automattic\WooCommerce\Utilities\FeaturesUtil' ) ) {
-			\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('cart_checkout_blocks',
-			 WP_PLUGIN_DIR . '/smartbill-woocommerce.php',false);
+			\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('cart_checkout_blocks', WP_PLUGIN_DIR . '/smartbill-woocommerce.php',false);
+			\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', WP_PLUGIN_DIR . '/smartbill-woocommerce.php',true);
 		}
 	} 
 

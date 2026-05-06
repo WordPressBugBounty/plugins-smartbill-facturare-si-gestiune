@@ -55,15 +55,20 @@ Te rugam sa ne contactezi la plugins@smartbill.ro.
 
 == Changelog ==
 
+= 3.4.10 =
+* Add - Adaugare confirmare compatibilitate HPOS
+* Fix - Salvare istoric facturare in order storage
+* Add - Compatibilitate cu WordPress 7.0
+* Add - Compatibilitate cu WooCommerce 10.7.0
 
 = 3.4.6 =
-Fix – Verificarea existenței fișierelor JavaScript se face în pagina curentă, nu la nivel global WordPress.
+* Fix - Verificarea existenței fișierelor JavaScript se face în pagina curentă, nu la nivel global WordPress.
 
 = 3.4.5 =
-Fix - Afisare CNP
+* Fix - Afisare CNP
 
 = 3.4.4 =
-Fix - Rezolvare avertisment php la adaugarea notei in detalii comanda
+* Fix - Rezolvare avertisment php la adaugarea notei in detalii comanda
 
 = 3.4.2 =
 * Add - Compatibilitate cu WooCommerce 9.9.5

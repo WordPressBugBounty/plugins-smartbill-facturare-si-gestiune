@@ -385,7 +385,7 @@ function smartbill_send_document_mail( $order_id ) {
 		/* translators: 4$s Factura 3$s bcc email addresses 2$s cc email addresses 1$s client email*/
 		$message = sprintf( __( '%4$s a fost trimisa cu succes catre: %1$s%2$s%3$s.', 'smartbill-woocommerce' ), $client_details['email'], $m_cc, $m_bcc, ucwords( $doc_type ) );
 		$order->add_order_note( $message );
-
+	
 		$return = array(
 			'status'  => 'true',
 			'code'    => $server_call['status']['code'],
@@ -395,6 +395,8 @@ function smartbill_send_document_mail( $order_id ) {
 		return $return;
 
 	} catch ( Exception $e ) {
+		$m_bcc="";
+		$m_cc="";
 		if ( ! empty( $document_settings['send_mail_bcc'] ) ) {
 			$m_bcc = ', ' . $document_settings['send_mail_bcc'];}
 		if ( ! empty( $document_settings['send_mail_cc'] ) ) {
@@ -650,6 +652,11 @@ function smartbill_create_document($type, $order_id, $get_um = true ) {
 				$order->add_order_note( esc_attr( $message ) );
 			}
 		}
+		if ( ! empty( $server_call['documentUrl'] ) ) {
+			update_post_meta( $order_id, 'smartbill_private_link', $server_call['documentUrl'] );
+			$order->update_meta_data( 'smartbill_private_link', $server_call['documentUrl'] );
+			$order->save();
+		}
 	} catch ( Exception $e ) {
 		$return=[];
 		$order             = new WC_Order( $order_id );
@@ -659,9 +666,6 @@ function smartbill_create_document($type, $order_id, $get_um = true ) {
 		$order->add_order_note(sprintf(__( '[%1$s] A aparut o eroare la emiterea documentului SmartBill! ', 'smartbill-woocommerce' ), $type));
 	}
 
-	if ( ! empty( $server_call['documentUrl'] ) ) {
-		update_post_meta( $order_id, 'smartbill_private_link', $server_call['documentUrl'] );
-	}
 	return $return;
 
 }
@@ -788,7 +792,7 @@ function smartbill_add_invoice_column_content( $column ,$order) {
 	}else{
 		$order_id=$order;
 	}
-	
+
 	switch ( $column ) {
 		case 'smartbill_woocommerce_invoice':
 			$invoice_log        = get_post_meta( $order_id, 'smartbill_invoice_log', true );

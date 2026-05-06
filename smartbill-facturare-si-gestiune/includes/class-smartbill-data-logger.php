@@ -118,6 +118,11 @@ class SmartBill_Data_Logger {
 			$this->order_id = $order_id;
 		}
 		$existing_data = $this->existing_data;
+		
+		$order = new WC_Order($order_id);
+		$order->update_meta_data( 'smartbill_invoice_log',$existing_data );
+		$order->save();
+		
 		return update_post_meta( $this->get_order_id(), 'smartbill_invoice_log', $existing_data );
 	}
 

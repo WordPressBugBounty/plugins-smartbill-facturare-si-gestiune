@@ -163,6 +163,12 @@ class SmartBillUtils {
 							// Percentage discount: calculate for each item
 							$coupon_discount_before_tax += $coupon->get_discount_amount($total_before_discount, $order_item, $order );
 							break;
+						case 'fixed_product':
+							$product = $order_item->get_product();
+							if ( $coupon->is_valid_for_product( $product, $order_item ) ) {
+								$coupon_discount_before_tax += $coupon->get_discount_amount($total_before_discount, $order_item, $order );
+							}
+							break;
 						default:
 							$items_quatity = ($order->get_item_count()-$free_items_count);
 							if( 0 != $items_quatity){
