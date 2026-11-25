@@ -16,25 +16,26 @@
             const billing_state= $('#billing_state');
             const billing_country= $('#billing_country');
             if(billing_city.length && billing_state.length && billing_country.length) {
-                let sectors = [
+                const og_city_placeholder = billing_city.attr("placeholder") || "";
+                const b_sectors = new Set([
                     "sector1", "sector2", "sector3", "sector4", "sector5", "sector6",
                     "1", "2", "3", "4", "5", "6", "s1", "s2", "s3", "s4", "s5", "s6",
                     "sec1", "sec2", "sec3", "sec4", "sec5", "sec6",
                     "sect1", "sect2", "sect3", "sect4", "sect5", "sect6"
-                ]; 
+                ]); 
                 if (billing_state.val() == "B" && billing_country.val() == "RO") {
                     if (billing_city.val() != "" && smartbill_billing.loc_checks === "1") {
-                        if (!sectors.includes(billing_city.val().replace(/[^A-Za-z0-9]/g, '').toLowerCase())){
+                        if (!b_sectors.has(billing_city.val().replace(/[^A-Za-z0-9]/g, '').toLowerCase())){
                             billing_city.val("");
                         }
                     }
                     billing_city.attr("placeholder", "Sector 1, Sector 2 etc.");
                 } 
-
-                billing_state.on('change', function (e) {
+                
+                $(this.body).on('change', '#billing_state', function () {
                     if (this.value == "B" && billing_country.val() == "RO") {
                         if (billing_city.val() != "" && smartbill_billing.loc_checks === "1") {
-                            if (!sectors.includes(billing_city.val().replace(/[^A-Za-z0-9]/g, '').toLowerCase())) {
+                            if (!b_sectors.has(billing_city.val().replace(/[^A-Za-z0-9]/g, '').toLowerCase())) {
                                 billing_city.val("");
                             }
                         }
@@ -43,16 +44,15 @@
                         }
                     }else{
                         if (billing_city.is('input, textarea')) {
-                            billing_city.attr("placeholder", "");
+                            billing_city.attr("placeholder", og_city_placeholder);
                         }
                     }
-
                 });
 
                 billing_country.on('change', function (e) {
-                    if (this.value == "B" && billing_country.val() == "RO") {
+                    if (this.value == "RO" && billing_state.val() == "B") {
                         if (billing_city.val() != "" && smartbill_billing.loc_checks === "1") {
-                            if (!sectors.includes(billing_city.val().replace(/[^A-Za-z0-9]/g, '').toLowerCase())) {
+                            if (!b_sectors.has(billing_city.val().replace(/[^A-Za-z0-9]/g, '').toLowerCase())) {
                                 billing_city.val("");
                             }
                         }
@@ -61,7 +61,7 @@
                         }
                     } else {
                         if (billing_city.is('input, textarea')) {
-                            billing_city.attr("placeholder", "");
+                            billing_city.attr("placeholder", og_city_placeholder);
                         }
                     }
 

@@ -1,7 +1,7 @@
 === SmartBill Facturare si Gestiune ===
 Requires at least: 4.7.0
-Tested up to: 6.8.3
-Stable tag: 3.4.6
+Tested up to: 7.2
+Stable tag: 3.5.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -54,6 +54,14 @@ Dupa prima configurare a modulului recomandam activarea optiunii “Emite ciorna
 Te rugam sa ne contactezi la plugins@smartbill.ro.
 
 == Changelog ==
+
+= 3.5.2 =
+* Fix - Eroare la preluarea cotei de TVA pentru produsele cu oferta cand setarea "Afiseaza pe factura reducerea de pret pe produs" este activa
+
+= 3.5.1 =
+* Fix - Corectie la raportarea discountului pentru cupoanele aplicate comenzilor cu mai multe cote de TVA
+* Add - Compatibilitate cu WooCommerce 11.3.1
+* Add - Compatibilitate cu WordPress 7.2
 
 = 3.4.10 =
 * Add - Adaugare confirmare compatibilitate HPOS

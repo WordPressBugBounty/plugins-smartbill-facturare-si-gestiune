@@ -95,6 +95,9 @@ class SmartBillUtils {
 				foreach ( $products as $item_id => $product ) {
 					$merged[ $item_id ] = $product;
 					if ( isset( $order_coupons[ $item_id ] ) ) {
+						$order_item = $order->get_item( $item_id );
+						$order_coupons[$item_id]->numberOfItems = 1;
+						
 						$merged[ $item_id . $order_coupons[ $item_id ]->code ] = $order_coupons[ $item_id ];
 					}
 				}
@@ -1075,7 +1078,7 @@ class SmartBillUtils {
 	 * @return int
 	 */
 	public static function calculate_tax_percentage( $price_with_vat, $price_without_vat ) {	
-		if(0 === $price_with_vat && "0" === $price_without_vat ){
+		if(0 == $price_with_vat && 0 == $price_without_vat ){
 			return -0;
 		}
 		if ( ! $price_with_vat || ! $price_without_vat ) {

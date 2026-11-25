@@ -135,7 +135,7 @@ class Smartbill_Woocommerce_Public {
 			
 			if ( ! isset( $_POST['ship_to_different_address'] ) ) {
 				update_post_meta( $order_id, 'smartbill_shipping_type', sanitize_text_field( wp_unslash( $_POST['smartbill_billing_type'] ) ) );
-				$order->update_meta_data( 'smartbill_shipping_type',trim( sanitize_text_field( wp_unslash( $_POST['smartbill_shipping_type'] ) ) ) );
+				$order->update_meta_data( 'smartbill_shipping_type',trim( sanitize_text_field( wp_unslash( $_POST['smartbill_billing_type'] ) ) ) );
 			} else {
 				if ( isset( $_POST['smartbill_shipping_type'] ) ) {
 					update_post_meta( $order_id, 'smartbill_shipping_type', sanitize_text_field( wp_unslash( $_POST['smartbill_shipping_type'] ) ) );
@@ -160,7 +160,7 @@ class Smartbill_Woocommerce_Public {
 					$order->update_meta_data( 'smartbill_billing_cif',trim( sanitize_text_field( wp_unslash( $_POST['smartbill_billing_cif'] ) ) ) );
 					if ( ! isset( $_POST['ship_to_different_address'] ) ) {
 						update_post_meta( $order_id, 'smartbill_shipping_cif', sanitize_text_field( wp_unslash( $_POST['smartbill_billing_cif'] ) ) );
-						$order->update_meta_data( 'smartbill_shipping_cif',trim( sanitize_text_field( wp_unslash( $_POST['smartbill_shipping_cif'] ) ) ) );
+						$order->update_meta_data( 'smartbill_shipping_cif',trim( sanitize_text_field( wp_unslash( $_POST['smartbill_billing_cif'] ) ) ) );
 					}
 				}
 
@@ -169,7 +169,7 @@ class Smartbill_Woocommerce_Public {
 					$order->update_meta_data( 'smartbill_billing_nr_reg_com',trim( sanitize_text_field( wp_unslash( $_POST['smartbill_billing_nr_reg_com'] ) ) ) );
 					if ( ! isset( $_POST['ship_to_different_address'] ) ) {
 						update_post_meta( $order_id, 'smartbill_shipping_nr_reg_com', sanitize_text_field( wp_unslash( $_POST['smartbill_billing_nr_reg_com'] ) ) );
-						$order->update_meta_data( 'smartbill_shipping_nr_reg_com',trim( sanitize_text_field( wp_unslash( $_POST['smartbill_shipping_nr_reg_com'] ) ) ) );
+						$order->update_meta_data( 'smartbill_shipping_nr_reg_com',trim( sanitize_text_field( wp_unslash( $_POST['smartbill_billing_nr_reg_com'] ) ) ) );
 					}
 				}
 			}
