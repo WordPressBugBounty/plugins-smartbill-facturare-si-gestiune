@@ -1,7 +1,7 @@
 === SmartBill Facturare si Gestiune ===
 Requires at least: 4.7.0
 Tested up to: 7.2
-Stable tag: 3.5.2
+Stable tag: 3.5.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -54,6 +54,15 @@ Dupa prima configurare a modulului recomandam activarea optiunii “Emite ciorna
 Te rugam sa ne contactezi la plugins@smartbill.ro.
 
 == Changelog ==
+
+= 3.5.4 =
+* Fix - Descarcarea istoricului de sincronizare manuala a stocurilor nu mai lasa fisiere in folderul uploads
+* Update - Doar utilizatorii cu acces la WooCommerce pot sincroniza manual stocurile si descarca istoricul
+
+= 3.5.3 =
+* Update - Actualizare librarie JavaScript SweetAlert2
+* Update - Verificare mai sigura a tokenului la sincronizarea automata a stocurilor
+* Fix - Corectie la activarea setarii de salvare a istoricului de stocuri
 
 = 3.5.2 =
 * Fix - Eroare la preluarea cotei de TVA pentru produsele cu oferta cand setarea "Afiseaza pe factura reducerea de pret pe produs" este activa

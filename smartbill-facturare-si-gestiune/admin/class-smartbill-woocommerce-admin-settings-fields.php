@@ -1588,16 +1588,40 @@ class Smartbill_Woocommerce_Admin_Settings_Fields {
 	 */
 	public function get_save_stock_history() {
 		$options = get_option( 'smartbill_plugin_options_settings' );
-		// create & write log file.
-		$file = __DIR__ . DIRECTORY_SEPARATOR . 'smartbill_sincronizare_stocuri.log';
-		if ( ! empty( $options ) && is_array( $options ) && isset( $options['save_stock_history'] ) ) {
+
+		$upload_dir = wp_upload_dir();
+
+		if ( ! empty( $upload_dir['error'] ) ) {
+			error_log( 'SmartBill: ' . $upload_dir['error'] );
+			return false;
+		}
+
+		$log_dir = trailingslashit( $upload_dir['basedir'] ) . 'smartbill';
+
+		if ( ! is_dir( $log_dir ) && ! wp_mkdir_p( $log_dir ) ) {
+			error_log( 'SmartBill: Unable to create log directory.' );
+			return false;
+		}
+
+		if ( ! is_writable( $log_dir ) ) {
+			error_log( 'SmartBill: Log directory is not writable.' );
+			return false;
+		}
+
+		$file = trailingslashit( $log_dir ) . 'smartbill_sincronizare_stocuri.log';
+
+		if (! empty( $options ) && is_array( $options ) && isset( $options['save_stock_history'] )) {
 			$save_stock_history = $options['save_stock_history'];
+
 			if ( true == $save_stock_history && ! file_exists( $file ) ) {
-				$mylog        = fopen( $file, 'a' );
-				$firstmessage = json_encode( '##Started Logging##' ) . "\n";
-				fwrite( $mylog, $firstmessage );
-				fclose( $mylog );
+				$mylog = fopen( $file, 'a' );
+
+				if ( false !== $mylog ) {
+					fwrite( $mylog, json_encode( '##Started Logging##' ) . "\n" );
+					fclose( $mylog );
+				}
 			}
+
 			if ( file_exists( $file ) && false == $save_stock_history ) {
 				unlink( $file );
 			}
@@ -1605,8 +1629,10 @@ class Smartbill_Woocommerce_Admin_Settings_Fields {
 			if ( file_exists( $file ) ) {
 				unlink( $file );
 			}
+
 			$save_stock_history = false;
 		}
+
 		return $save_stock_history;
 	}
 
@@ -2287,35 +2313,60 @@ class Smartbill_Woocommerce_Admin_Settings_Fields {
 	 *
 	 * Returns JSON array.
 	 */
-	public function smartbill_woocommerce_download_manual_stock_history(){
+	public function smartbill_woocommerce_download_manual_stock_history() {
 		check_ajax_referer( 'smartbill_nonce', 'security' );
-		$return = array();
-		$error  = '';
-		if ( is_admin() ) {
-			try {
-				$file = __DIR__ . DIRECTORY_SEPARATOR . 'Istoric sincronizare manuala SmartBill.csv';
-				if ( ! file_exists( $file ) ) {
-					throw new Exception( esc_attr__( 'Fisier inexistent!', 'smartbill-woocommerce' ) );
-				}
 
-				$zip_name = 'smartbill_istoric_sincronizare_manuala_stocuri';
-				$zip      = new ZipArchive();
-
-				$zip_path = wp_upload_dir()['path'] . DIRECTORY_SEPARATOR . $zip_name . '.zip';
-				$zip->open( $zip_path, ZipArchive::CREATE | ZipArchive::OVERWRITE );
-				$zip->addFile( $file, 'Istoric sincronizare manuala SmartBill.csv' );
-				$zip->close();
-
-				$return['data'] = wp_upload_dir()['url'] . DIRECTORY_SEPARATOR . $zip_name . '.zip';
-			} catch ( Exception $e ) {
-				$error = $e->getMessage();
-			}
+		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+			wp_die( esc_html__( 'Acces interzis!', 'smartbill-woocommerce' ), '', array(
+				'response' => 403,
+			) );
 		}
 
-		$return['error'] = $error;
-		echo json_encode( $return );
-		die();
+		$upload_dir = wp_upload_dir();
+		$file = trailingslashit( $upload_dir['basedir'] ) . 'Istoric sincronizare manuala SmartBill.csv';
+
+		if ( ! file_exists( $file ) || ! is_readable( $file ) ) {
+			wp_die( esc_html__( 'Fisier inexistent!', 'smartbill-woocommerce' ), '', array(
+				'response' => 404,
+			) );
+		}
+
+		$tmp_file = wp_tempnam( 'smartbill-stock-history-' );
+
+		if ( ! $tmp_file ) {
+			wp_die( 'Nu s-a putut crea fisierul temporar!' );
+		}
+
+		$zip = new ZipArchive();
+
+		if ( true !== $zip->open( $tmp_file, ZipArchive::CREATE | ZipArchive::OVERWRITE ) ) {
+			unlink( $tmp_file );
+			wp_die( 'Nu s-a putut crea arhiva ZIP!' );
+		}
+
+		if ( ! $zip->addFile( $file, 'Istoric sincronizare manuala SmartBill.csv' ) ) {
+			$zip->close();
+			unlink( $tmp_file );
+			wp_die( 'Nu s-a putut adauga fisierul in arhiva ZIP!' );
+		}
+
+		if ( ! $zip->close() ) {
+			unlink( $tmp_file );
+			wp_die( 'Nu s-a putut inchide arhiva ZIP!' );
+		}
+
+		nocache_headers();
+
+		header( 'Content-Type: application/zip' );
+		header( 'Content-Disposition: attachment; filename="smartbill_istoric_sincronizare_manuala_stocuri.zip"' );
+		header( 'Content-Length: ' . filesize( $tmp_file ) );
+
+		readfile( $tmp_file );
+		unlink( $tmp_file );
+
+		exit;
 	}
+
 
 
 	/**
@@ -2329,7 +2380,8 @@ class Smartbill_Woocommerce_Admin_Settings_Fields {
 		check_ajax_referer( 'smartbill_nonce', 'security' );
 		$return = array();
 		$error  = '';
-		if ( is_admin() ) {
+
+		if ( current_user_can( 'manage_woocommerce' ) ) {
 			try {
 				if ( isset( $_POST['body'] ) ) {
 					$warehouse = sanitize_text_field( wp_unslash( $_POST['body']) );
@@ -2372,7 +2424,23 @@ class Smartbill_Woocommerce_Admin_Settings_Fields {
 				if ( isset( $stocks['products'] ) && 0 < count($stocks['products']) ) {
 					$updated_products=0;
 					
-					$file = fopen(__DIR__ . DIRECTORY_SEPARATOR . 'Istoric sincronizare manuala SmartBill.csv', 'w');
+					$upload_dir = wp_upload_dir();
+
+					if ( ! empty( $upload_dir['error'] ) ) {
+						throw new Exception( $upload_dir['error'] );
+					}
+
+					$file = fopen(
+						trailingslashit( $upload_dir['basedir'] ) . 'Istoric sincronizare manuala SmartBill.csv',
+						'w'
+					);
+
+					if ( false === $file ) {
+						throw new Exception(
+							esc_attr__( 'Nu s-a putut crea fisierul CSV pentru istoricul sincronizarii.', 'smartbill-woocommerce' )
+						);
+					}
+
 					fputcsv($file, [ 
 						esc_attr__( 'Cod produs SmartBill' , 'smartbill-woocommerce' ),
 						esc_attr__( 'Denumire produs SmartBill' , 'smartbill-woocommerce' ),
@@ -2428,6 +2496,8 @@ class Smartbill_Woocommerce_Admin_Settings_Fields {
 			} catch ( Exception $e ) {
 				$error = $e->getMessage();
 			}
+		} else {
+			$error = esc_attr__( 'Nu ai permisiunea de a actualiza stocurile.', 'smartbill-woocommerce' );
 		}
 
 		$return['error'] = $error;

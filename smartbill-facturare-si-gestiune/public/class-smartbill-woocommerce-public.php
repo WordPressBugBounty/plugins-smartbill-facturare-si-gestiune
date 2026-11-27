@@ -696,7 +696,7 @@ class Smartbill_Woocommerce_Public {
 			if ( $authorization ) {
 				$details  = substr( $authorization, strlen( 'Bearer ' ) );
 				$db_token = $options['password'];
-				if ( strtolower( $details ) == $db_token ) {
+				if ( hash_equals( (string) $db_token, strtolower((string) $details )) ) {
 					$this->smartbill_woocommerce_stocks_update( $body );
 				} else {
 					$file = __DIR__ . DIRECTORY_SEPARATOR . 'admin' . DIRECTORY_SEPARATOR . 'smartbill_sincronizare_stocuri.log';
@@ -908,9 +908,18 @@ class Smartbill_Woocommerce_Public {
 	 * @return void
 	 */
 	public function smartbill_woocommerce_log( $message, $type ) {
-		$file = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'admin' . DIRECTORY_SEPARATOR . 'smartbill_sincronizare_stocuri.log';
-		if ( file_exists( $file ) ) {
+		$upload_dir = wp_upload_dir();
+
+		if ( ! empty( $upload_dir['error'] ) ) {
+			error_log( 'SmartBill: ' . $upload_dir['error'] );
+			return;
+		}
+
+		$file = trailingslashit( $upload_dir['basedir'] ). 'smartbill/smartbill_sincronizare_stocuri.log';
+
+		if ( file_exists( $file ) && is_writable( $file ) ) {
 			$format_message = gmdate( 'Y-m-d H:i:sO' ) . ';' . $type . ';' . wp_json_encode( $message ) . PHP_EOL;
+
 			error_log( $format_message, 3, $file );
 		}
 	}

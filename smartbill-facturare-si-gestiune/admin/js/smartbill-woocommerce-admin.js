@@ -41,7 +41,7 @@
                         storedMessages = JSON.parse(localStorage.successMessages);
                         storedMessages.forEach(function (item, index, array) {
                             Toastify({
-                                text: item, duration: 3000, newWindow: false, close: true, escapeMarkup: false, gravity: "top", position: 'center', backgroundColor: "#00A14B", stopOnFocus: true,
+                                text: item, duration: 3000, newWindow: false, close: true, escapeMarkup: true, gravity: "top", position: 'center', backgroundColor: "#00A14B", stopOnFocus: true,
                             }).showToast();
                             if (index === array.length - 1) {
                                 localStorage.removeItem("successMessages");
@@ -53,7 +53,7 @@
                         storedMessages = JSON.parse(localStorage.errorMessages);
                         storedMessages.forEach(function (item, index, array) {
                             Toastify({
-                                text: item, duration: -1, newWindow: false, close: true, escapeMarkup: false, gravity: "top", position: 'center', backgroundColor: "#EF4136", stopOnFocus: true,
+                                text: item, duration: -1, newWindow: false, close: true, escapeMarkup: true, gravity: "top", position: 'center', backgroundColor: "#EF4136", stopOnFocus: true,
                             }).showToast();
                             if (index === array.length - 1) {
                                 localStorage.removeItem("errorMessages");
@@ -181,35 +181,83 @@
                                             reverseButtons: true,
                                             showConfirmButton: false
                                         });
+                                       
                                         $.ajax({
                                             url: ajaxurl,
-                                            type: 'post',
+                                            type: 'POST',
                                             data: {
                                                 security: smartbill.security,
                                                 action: 'smartbill_woocommerce_download_manual_stock_history'
                                             },
+                                            xhrFields: {
+                                                responseType: 'blob'
+                                            },
                                             success: function (response) {
-                                                response = JSON.parse(response);
+                                                Swal.close();
 
-                                                try {
-                                                    if (undefined != response.data) {
-                                                        Swal.close();
-                                                        location.href = response.data;
-                                                    } else {
-                                                        throw response.error;
-                                                    }
-                                                } catch (error) {
-                                                    errorMessages.push(error);
+                                                if ( ! response || response.size === 0 ) {
+                                                    errorMessages.push('Arhiva ZIP este goala sau invalida.');
+                                                    saveMessages();
+                                                    location.reload();
+                                                    return;
+                                                }
+
+                                                const url = window.URL.createObjectURL(response);
+                                                const link = document.createElement('a');
+
+                                                link.href = url;
+                                                link.download = 'smartbill_istoric_sincronizare_manuala_stocuri.zip';
+
+                                                document.body.appendChild(link);
+                                                link.click();
+                                                link.remove();
+
+                                                // Give the browser time to start the download.
+                                                setTimeout(function () {
+                                                    window.URL.revokeObjectURL(url);
+                                                }, 1000);
+                                            },
+                                            error: function (request, status, error) {
+                                                const response = request.response;
+
+                                                if ( response instanceof Blob ) {
+                                                    const reader = new FileReader();
+
+                                                    reader.onload = function () {
+                                                        let message = error || 'Eroare la descarcarea arhivei ZIP.';
+
+                                                        try {
+                                                            const result = JSON.parse(reader.result);
+
+                                                            if ( result.data && result.data.message ) {
+                                                                message = result.data.message;
+                                                            }
+                                                        } catch (e) {
+                                                            if ( reader.result ) {
+                                                                message = reader.result;
+                                                            }
+                                                        }
+
+                                                        errorMessages.push(message);
+                                                        saveMessages();
+                                                        location.reload();
+                                                    };
+
+                                                    reader.onerror = function () {
+                                                        errorMessages.push('Nu s-a putut citi raspunsul serverului.');
+                                                        saveMessages();
+                                                        location.reload();
+                                                    };
+
+                                                    reader.readAsText(response);
+                                                } else {
+                                                    errorMessages.push(error || 'Eroare la descarcarea arhivei ZIP.');
                                                     saveMessages();
                                                     location.reload();
                                                 }
-                                            },
-                                            error: function (request, status, error) {
-                                                errorMessages.push(error);
-                                                saveMessages();
-                                                location.reload();
                                             }
                                         });
+
                                     });
 
                                 } else {
@@ -1049,7 +1097,7 @@
         $("#url_container_stocks strong").click(function (e) {
             navigator.clipboard.writeText(this.innerText);
             Toastify({
-                text: "URL-ul a fost copiat cu succes!", duration: 3000, newWindow: false, escapeMarkup: false, close: true, gravity: "top", position: 'center', backgroundColor: "#00A14B", stopOnFocus: true,
+                text: "URL-ul a fost copiat cu succes!", duration: 3000, newWindow: false, escapeMarkup: true, close: true, gravity: "top", position: 'center', backgroundColor: "#00A14B", stopOnFocus: true,
             }).showToast();
         });
 
